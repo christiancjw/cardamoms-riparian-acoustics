@@ -4,11 +4,17 @@ format: html
 editor: visual
 ---
 
-# Site Based Analyses
+# Site Based Acoustic Analyses
+
+![](images/%5D.jpg){width="265"}
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
+<<<<<<< HEAD
 ## Setting up
+=======
+## Setting up libraries
+>>>>>>> 61ffbfa (lINES CHANGED)
 
 ```{R}
 library(vegan)
@@ -30,7 +36,11 @@ file_list <- list.files(path = ".", pattern = "Towsey.Acoustic.Indices.csv",
 
 ```
 
+<<<<<<< HEAD
 ## Reading in csv files from Stung Ta Chey
+=======
+## Reading in .csv files from Stung Ta Chey Site
+>>>>>>> 61ffbfa (lINES CHANGED)
 
 ```{R}
 
