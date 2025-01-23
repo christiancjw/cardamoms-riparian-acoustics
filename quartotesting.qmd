@@ -8,7 +8,8 @@ editor: visual
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
-## Setting up libraries
+## Setting up
+
 ```{R}
 library(vegan)
 library(ggplot2)
@@ -19,6 +20,7 @@ library(tidyr)
 ```
 
 ## Setting in working directory and reading in function to extract files
+
 ```{R}
 setwd("/Users/christianching/Documents/Projects/cardamoms-riparian-acoustics")
 
@@ -29,6 +31,7 @@ file_list <- list.files(path = ".", pattern = "Towsey.Acoustic.Indices.csv",
 ```
 
 ## Reading in csv files from Stung Ta Chey
+
 ```{R}
 
 
