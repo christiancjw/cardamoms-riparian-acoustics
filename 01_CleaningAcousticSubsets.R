@@ -8,6 +8,8 @@ library(stringr)
 library(readr)
   # read_csv(): Used to read in the csv files better than base R read.csv()
   # write_csv(): Used to save clean data more efficiently than base R write.csv()
+library(lubridate)
+
 
 # Define Mapping of Sites to Strahler Orders 
 strahler_map <- list("TaChey" = 1, "Arai" = 3, "Stung Oda" = 1,
@@ -60,9 +62,10 @@ clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, ou
           Time = substr(FileName, 10, 15),  # Extract HHMMSS from FileName
           Site = site,
           Device = device,
-          Strahler = strahler_map[[site]]  # Add Strahler order column
+          Strahler = strahler_map[[site]],  # Add Strahler order column
+          Month = month(as.Date(Date, "%Y%m%d"), label = TRUE, abbr = TRUE)  # Add abbreviated month column
         ) %>%
-        select(Site, Device, Date, Time, Strahler, everything())  # Reorder columns
+        select(Site, Device, Date, Time, Strahler, Month, everything())  # Reorder columns
       
       # Define output file path within site/device subfolders
       output_file <- file.path(device_output_dir, paste0(site, "_", device, "_", date_value, "_cleaned.csv"))
