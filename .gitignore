@@ -50,3 +50,7 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Data folder
+raw_data/
+clean_data/

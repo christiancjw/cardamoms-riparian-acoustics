@@ -9,9 +9,11 @@ library(readr)
   # read_csv(): Used to read in the csv files better than base R read.csv()
   # write_csv(): Used to save clean data more efficiently than base R write.csv()
 
-
-
-
+# Define Mapping of Sites to Strahler Orders 
+strahler_map <- list("TaChey" = 1, "Arai" = 3, "Stung Oda" = 1,
+                     "KnaongBatSa" = 1, "TaSay" = 4, "Kronomh" = 5, 
+                     "DamFive" = 6, "TangRang" = 6, "Kravanh Bridge" = 5, "PursatTown" = 7)
+   
 #### Function to clean and export acoustic index data ----
 clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, output_dir = "clean_data") {
   
@@ -57,9 +59,10 @@ clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, ou
           Date = substr(FileName, 1, 8),  # Extract YYYYMMDD from FileName
           Time = substr(FileName, 10, 15),  # Extract HHMMSS from FileName
           Site = site,
-          Device = device
+          Device = device,
+          Strahler = strahler_map[[site]]  # Add Strahler order column
         ) %>%
-        select(Site, Device, Date, Time, everything())  # Reorder columns
+        select(Site, Device, Date, Time, Strahler, everything())  # Reorder columns
       
       # Define output file path within site/device subfolders
       output_file <- file.path(device_output_dir, paste0(site, "_", device, "_", date_value, "_cleaned.csv"))
@@ -99,6 +102,8 @@ clean_acoustic_data(
   device = "CI10",    
   start_date = "20240110",        
   end_date = "20240620")          
+
+
 
 # Arai
 clean_acoustic_data(
