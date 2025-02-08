@@ -467,7 +467,7 @@ jan24_midn_list <- list(jan_midn1_TachCI10, jan_midn1_TachCC01,
 jan24_midn_data <- bind_rows(jan24_midn_list)
 
 
-##### ODA Site Temporal Subset
+##### ODA Site Temporal Subset ----------------------------------------------------------------
 
 # Oda
 apr_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "000000", "235999")
@@ -494,5 +494,53 @@ oda_dawn_list <- list(nov_dawn_OdaCI01, nov_dawn_OdaCI13,
                         apr_dawn_OdaCI01, apr_dawn_OdaCI13, 
                         jun_dawn_OdaCI01, jun_dawn_OdaCI13)
 
-oda_dawn_data <- bind_rows(oda_season_list)
+oda_dawn_data <- bind_rows(oda_dawn_list)
+
+# Oda Midday
+apr_midd_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "103000", "143000")
+apr_midd_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "103000", "143000")
+jun_midd_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240616", "20240625", "103000", "143000")
+jun_midd_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240616", "20240625", "103000", "143000")
+
+oda_midd_list <- list(nov_midd_OdaCI01, nov_midd_OdaCI13, 
+                      jan_midd_OdaCI01, jan_midd_OdaCI13, 
+                      apr_midd_OdaCI01, apr_midd_OdaCI13, 
+                      jun_midd_OdaCI01, jun_midd_OdaCI13)
+
+oda_midd_data <- bind_rows(oda_midd_list)
+
+# Oda Dusk
+apr_dusk_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "153000", "193000")
+apr_dusk_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "153000", "193000")
+jun_dusk_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240616", "20240625", "153000", "193000")
+jun_dusk_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240616", "20240625", "153000", "193000")
+
+oda_dusk_list <- list(nov_dusk_OdaCI01, nov_dusk_OdaCI13, 
+                      jan_dusk_OdaCI01, jan_dusk_OdaCI13, 
+                      apr_dusk_OdaCI01, apr_dusk_OdaCI13, 
+                      jun_dusk_OdaCI01, jun_dusk_OdaCI13)
+
+oda_dusk_data <- bind_rows(oda_dusk_list)
+
+
+# Oda Midnight
+apr_midn1_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "000000", "020000")
+apr_midn2_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "220000", "245900")
+apr_midn1_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "000000", "020000")
+apr_midn2_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "220000", "245900")
+jun_midn1_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240616", "20240625", "000000", "020000")
+jun_midn2_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240616", "20240625", "220000", "245900")
+jun_midn1_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240616", "20240625", "000000", "020000")
+jun_midn2_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240616", "20240625", "220000", "245900")
+
+oda_midn_list <- list(nov_midn1_OdaCI01, nov_midn1_OdaCI13, 
+                      nov_midn2_OdaCI01, nov_midn2_OdaCI13, 
+                      jan_midn1_OdaCI01, jan_midn1_OdaCI13, 
+                      jan_midn2_OdaCI01, jan_midn2_OdaCI13, 
+                      apr_midn1_OdaCI01, apr_midn1_OdaCI13, 
+                      apr_midn2_OdaCI01, apr_midn2_OdaCI13, 
+                      jun_midn1_OdaCI01, jun_midn1_OdaCI13,
+                      jun_midn2_OdaCI01, jun_midn2_OdaCI13)
+
+oda_midn_data <- bind_rows(oda_midn_list)
 

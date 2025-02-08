@@ -106,8 +106,6 @@ clean_acoustic_data(
   start_date = "20240110",        
   end_date = "20240620")          
 
-
-
 # Arai
 clean_acoustic_data(
   base_dir = base_directory,
@@ -248,3 +246,4 @@ clean_acoustic_data(
   device = "CI09",    
   start_date = "20231123",        
   end_date = "20240710")
+

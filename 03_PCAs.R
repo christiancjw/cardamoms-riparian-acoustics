@@ -21,6 +21,7 @@ run_pca <- function(data_subset) {
   return(pca_result)
 }
 
+
 ### November -------------------------------------------------------------------------------------------
 
 #### November Full Day Dataset ---------------------------------------------
@@ -397,7 +398,7 @@ grid.arrange(plot_jan_full, plot_jan_dawn, plot_jan_midd, plot_jan_dusk, plot_ja
 #### January 3D Plots -------------------------------------------
 
 # jan Full Day
-threeD_jan<- plot_ly(jan_pca_scores,
+threeD_jan <- plot_ly(jan_pca_scores,
                      x = ~PC1,
                      y = ~PC2,
                      z = ~PC3,
@@ -490,7 +491,59 @@ threeD_jan_midn
 
 
 q
+
 #### Oda Temporal Series -------------------------------------------
 
+# FULL
+# Run PCA on the combined dataset
+oda_pca <- run_pca(oda_season_data)
 
-oda_season_data
+# View PCA summary
+summary(oda_pca)
+oda_loadings <- oda_pca$rotation
+oda_loadings 
+
+# Add PCA scores to the dataset
+oda_pca_scores <- as.data.frame(oda_pca$x) %>%
+  mutate(Device = oda_season_data$Device, 
+         Site = oda_season_data$Site, 
+         Date = oda_season_data$Date, 
+         Month = oda_season_data$Month,
+         Time = oda_season_data$Time )
+
+# PCA plot with site colors
+plot_oda_temporal <- ggplot(oda_pca_scores, aes(x = PC1, y = PC2, color = Month)) +
+  geom_point(size = 0.0001) +
+  labs(title = "PCA of Stung Oda indices across year") + 
+  stat_ellipse(aes(colour = Month), type = "norm", level = 0.4) +
+  theme_minimal()
+
+plot_oda_temporal
+
+# Dawn Choruses
+
+# Run PCA on the combined dataset
+oda_dawn_pca <- run_pca(oda_dawn_data)
+
+# View PCA summary
+summary(oda_dawn_pca)
+oda_dawn_loadings <- oda_dawn_pca$rotation
+oda_dawn_loadings 
+
+# Add PCA scores to the dataset
+oda_dawn_pca_scores <- as.data.frame(oda_dawn_pca$x) %>%
+  mutate(Device = oda_dawn_data$Device, 
+         Site = oda_dawn_data$Site, 
+         Date = oda_dawn_data$Date, 
+         Month = oda_dawn_data$Month,
+         Time = oda_dawn_data$Time )
+
+# PCA plot with site colors
+plot_oda_dawn_temporal <- ggplot(oda_dawn_pca_scores, aes(x = PC1, y = PC2, color = Month)) +
+  geom_point(size = 0.0001) +
+  labs(title = "PCA of Stung Oda dawn indices") + 
+  stat_ellipse(aes(colour = Month), type = "norm", level = 0.4) +
+  theme_minimal()
+
+plot_oda_dawn_temporal
+
