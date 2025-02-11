@@ -1,10 +1,15 @@
 library(tidyverse) # General data organisation 
 library(lubridate) # For use of timings to subset data
 
-#### Setup & Read in Data -----------------------------------------------------------------
+#### Setup  -----------------------------------------------------------------
 
+# Define the main directory
+main_dir <- "/Users/christianching/Documents/Projects/cardamoms-riparian-acoustics/clean_data/concatenated_sites_devices"
 
-# Function to read all CSV files for a single device and store it as an object
+# Check main directory exists
+dir.exists(main_dir) 
+
+# Function to read all CSV files for a single device and store it as an object  --------------------
 read_device_data <- function(device_path) {
   files <- list.files(device_path, pattern = "*.csv", full.names = TRUE)
   device_data <- files %>%
@@ -12,11 +17,23 @@ read_device_data <- function(device_path) {
   return(device_data)
   }
 
+# Function to Subset Data -----------------------------------------------------------------
 
-# Define the main directory
-main_dir <- "/Users/christianching/Documents/Projects/cardamoms-riparian-acoustics/clean_data"
-dir.exists(main_dir) # Checks the existence of directory
+# Define the function to subset the data based on time and date
+subset_data_by_time_and_date <- function(device_data, start_date, end_date, start_time, end_time) {
+  # Ensure that the Date and Time columns are in the correct format
+  device_data$Date <- as.character(device_data$Date)  # Ensure Date is in character format
+  device_data$Time <- format(strptime(as.character(device_data$Time), format = "%H%M%S"), "%H%M")
+  
+  # Subset data by the provided date range and time range
+  subset <- device_data %>%
+    filter(Date >= as.character(start_date) & Date <= as.character(end_date)) %>%
+    filter(Time >= start_time & Time <= end_time)
+  
+  return(subset)
+}
 
+# Data Read-In -----------------------------------------------------------------------------
 # Get all device directories (only those containing CSV files)
 device_dirs <- list.dirs(main_dir, recursive = TRUE, full.names = TRUE) %>%
   keep(~ length(list.files(.x, pattern = "*.csv", full.names = TRUE)) > 0)
@@ -34,23 +51,7 @@ head(unique(CI07$Time)) # Check available times
 
 
 
-#### Function to Subset Data -----------------------------------------------------------------
 
-# Define the function to subset the data based on time and date
-subset_data_by_time_and_date <- function(device_data, start_date, end_date, start_time, end_time) {
-  # Ensure that the Date and Time columns are in the correct format
-  device_data$Date <- as.character(device_data$Date)  # Ensure Date is in character format
-  device_data$Time <- format(strptime(as.character(device_data$Time), format = "%H%M%S"), "%H%M")
-  
-  # Subset data by the provided date range and time range
-  subset <- device_data %>%
-    filter(Date >= as.character(start_date) & Date <= as.character(end_date)) %>%
-    filter(Time >= start_time & Time <= end_time)
-  
-  return(subset)
-}
-
- 
 #### November 2023 Full Day Subsets  -----------------------------------------------------------------
 
 # Arai
@@ -62,7 +63,7 @@ nov_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "00000
 nov_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "000000", "235999")
 
 # Tang Rang Bridge
-nov_TRangCC07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "000000", "235999")
+nov_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "000000", "235999")
 nov_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "000000", "235999")
 
 # Kravanh
@@ -74,8 +75,12 @@ nov_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "00000
 nov_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "000000", "235999")
 
 # Combine Dataframe for November 2023 Full Days
-Nov23_fullday_list <- list(nov_AraiCI02, nov_AraiCI14, nov_OdaCI01, nov_OdaCI13, nov_TRangCC07, nov_TRangCI07, nov_KraCC08, nov_KraCI08, nov_PurCC09, nov_PurCI09)
-Nov23_fullday_data <- bind_rows(Nov23_fullday_list)
+nov23_fullday_list <- list(nov_AraiCI02, nov_AraiCI14, nov_OdaCI01, nov_OdaCI13, nov_TRangCC07, nov_TRangCI07, nov_KraCC08, nov_KraCI08, nov_PurCC09, nov_PurCI09)
+nov23_fullday_data <- bind_rows(nov23_fullday_list)
+
+# Write CSV for nov_23_fullday_data
+write.csv(Nov23_fullday_data, "clean_data/datasets/nov_23_fullday_data.csv", row.names = FALSE)
+
 
 #### November 2023 Dawn Chorus Subset -----------------------------------------------------------------
 
@@ -88,7 +93,7 @@ nov_dawn_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "
 nov_dawn_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "050000", "090000")
 
 # Tang Rang Bridge
-nov_dawn_TRangCC07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "050000", "090000")
+nov_dawn_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "050000", "090000")
 nov_dawn_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "050000", "090000")
 
 # Kravanh
@@ -100,12 +105,14 @@ nov_dawn_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "
 nov_dawn_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "050000", "090000")
 
 # Combine Dataframe for November 2023 Dawn Choruses
-Nov23_dawn_list <- list(nov_dawn_AraiCI02, nov_dawn_AraiCI14,
+nov23_dawn_list <- list(nov_dawn_AraiCI02, nov_dawn_AraiCI14,
                         nov_dawn_OdaCI01, nov_dawn_OdaCI13, 
                         nov_dawn_TRangCC07, nov_dawn_TRangCI07, 
                         nov_dawn_KraCC08, nov_dawn_KraCI08, 
                         nov_dawn_PurCC09, nov_dawn_PurCI09)
-Nov23_dawn_data <- bind_rows(Nov23_dawn_list)
+nov23_dawn_data <- bind_rows(nov23_dawn_list)
+
+write.csv(nov23_dawn_data, "clean_data/datasets/nov23_dawn_data.csv", row.names = FALSE)
 
 #### November Midday Subset ---------------------------------------------
 # Arai 
@@ -117,7 +124,7 @@ nov_midd_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "
 nov_midd_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "103000", "143000")
 
 # Tang Rang Bridge
-nov_midd_TRangCC07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "103000", "143000")
+nov_midd_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "103000", "143000")
 nov_midd_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "103000", "143000")
 
 # Kravanh
@@ -129,12 +136,15 @@ nov_midd_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "
 nov_midd_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "103000", "143000")
 
 # Combine Dataframe for November 2023 Dawn Choruses
-Nov23_midd_list <- list(nov_midd_AraiCI02, nov_midd_AraiCI14,
+nov23_midd_list <- list(nov_midd_AraiCI02, nov_midd_AraiCI14,
                         nov_midd_OdaCI01, nov_midd_OdaCI13, 
                         nov_midd_TRangCC07, nov_midd_TRangCI07, 
                         nov_midd_KraCC08, nov_midd_KraCI08, 
                         nov_midd_PurCC09, nov_midd_PurCI09)
-Nov23_midd_data <- bind_rows(Nov23_midd_list)
+nov23_midd_data <- bind_rows(nov23_midd_list)
+
+write.csv(nov23_midd_data, "clean_data/datasets/nov23_midd_data.csv", row.names = FALSE)
+
 
 #### November Dusk Chorus Subset ---------------------------------------------
 
@@ -147,7 +157,7 @@ nov_dusk_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "
 nov_dusk_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "153000", "193000")
 
 # Tang Rang Bridge
-nov_dusk_TRangCC07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "153000", "193000")
+nov_dusk_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "153000", "193000")
 nov_dusk_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "153000", "193000")
 
 # Kravanh
@@ -159,12 +169,15 @@ nov_dusk_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "
 nov_dusk_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "153000", "193000")
 
 # Combine Dataframe for November 2023 Dawn Choruses
-Nov23_dusk_list <- list(nov_dusk_AraiCI02, nov_dusk_AraiCI14,
+nov23_dusk_list <- list(nov_dusk_AraiCI02, nov_dusk_AraiCI14,
                         nov_dusk_OdaCI01, nov_dusk_OdaCI13, 
                         nov_dusk_TRangCC07, nov_dusk_TRangCI07, 
                         nov_dusk_KraCC08, nov_dusk_KraCI08, 
                         nov_dusk_PurCC09, nov_dusk_PurCI09)
-Nov23_dusk_data <- bind_rows(Nov23_dusk_list)
+nv23_dusk_data <- bind_rows(nov23_dusk_list)
+
+write.csv(nov23_midd_data, "clean_data/datasets/nov23_midd_data.csv", row.names = FALSE)
+
 
 #### November Midnight Subset ---------------------------------------------
 
@@ -203,13 +216,14 @@ nov_midn2_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", 
 
 
 # Combine Dataframe for November 2023 Dawn Choruses
-Nov23_midn_list <- list(nov_midn1_AraiCI02, nov_midn2_AraiCI02, nov_midn1_AraiCI14, nov_midn2_AraiCI14,
+nov23_midn_list <- list(nov_midn1_AraiCI02, nov_midn2_AraiCI02, nov_midn1_AraiCI14, nov_midn2_AraiCI14,
                         nov_midn1_OdaCI01,  nov_midn2_OdaCI01, nov_midn1_OdaCI13, nov_midn2_OdaCI13,
                         nov_midn1_TRangCC07, nov_midn2_TRangCC07, nov_midn1_TRangCI07, nov_midn2_TRangCI07,
                         nov_midn1_KraCC08, nov_midn2_KraCC08, nov_midn1_KraCI08, nov_midn2_KraCI08,
                         nov_midn1_PurCC09, nov_midn2_PurCC09, nov_midn1_PurCI09, nov_midn2_PurCI09)
-Nov23_midn_data <- bind_rows(Nov23_midn_list)
+nov23_midn_data <- bind_rows(nov23_midn_list)
 
+write.csv(nov23_midn_data, "clean_data/datasets/nov23_midn_data.csv", row.names = FALSE)
 
 
 #### January 2024 Full Day Subset ------------------------------------------------------------------------------------------
@@ -239,7 +253,7 @@ jan_DamCC11 <- subset_data_by_time_and_date(CC11, "20240113", "20240122", "00000
 jan_DamCI11 <- subset_data_by_time_and_date(CI11, "20240113", "20240122", "000000", "235999")
 
 # Tang Rang Bridge
-jan_TRangCC07 <- subset_data_by_time_and_date(CI07, "20240110", "20240119", "000000", "235999")
+jan_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240110", "20240119", "000000", "235999")
 jan_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240110", "20240119", "000000", "235999")
 
 # Pursat
@@ -257,6 +271,9 @@ jan24_fullday_list <- list(jan_TachCI10, jan_TachCC01,
                            jan_PurCC09, jan_PurCI09)
 
 jan24_fullday_data <- bind_rows(jan24_fullday_list)
+
+# Write CSV for jan_24_fullday_data
+write.csv(jan24_fullday_data, "clean_data/datasets/jan_24_fullday_data.csv", row.names = FALSE)
 
 
 #### January 2024 Dawn Chorus Subset ------------------------------------------------------------------------------------------
@@ -305,6 +322,9 @@ jan24_dawn_list <- list(jan_dawn_TachCI10, jan_dawn_TachCC01,
 
 jan24_dawn_data <- bind_rows(jan24_dawn_list)
 
+write.csv(jan24_dawn_data, "clean_data/datasets/jan24_dawn_data.csv", row.names = FALSE)
+
+
 #### January 2024 Midday Subset ------------------------------------------------------------------------------------------
 
 # Ta Chey
@@ -349,6 +369,9 @@ jan24_midd_list <- list(jan_midd_TachCI10, jan_midd_TachCC01,
                         jan_midd_TRangCC07, jan_midd_TRangCI07, 
                         jan_midd_PurCC09, jan_midd_PurCI09)
 jan24_midd_data <- bind_rows(jan24_midd_list)
+
+write.csv(jan24_midd_data, "clean_data/datasets/jan24_midd_data.csv", row.names = FALSE)
+
 
 #### January 2024 Dusk Chorus Subset ------------------------------------------------------------------------------------------
 
@@ -395,6 +418,9 @@ jan24_dusk_list <- list(jan_dusk_TachCI10, jan_dusk_TachCC01,
                         jan_dusk_TRangCC07, jan_dusk_TRangCI07, 
                         jan_dusk_PurCC09, jan_dusk_PurCI09)
 jan24_dusk_data <- bind_rows(jan24_dusk_list)
+
+write.csv(jan24_dusk_data, "clean_data/datasets/jan24_dusk_data.csv", row.names = FALSE)
+
 
 #### January 2024 Midnight Subset ------------------------------------------------------------------------------------------
 
@@ -466,8 +492,11 @@ jan24_midn_list <- list(jan_midn1_TachCI10, jan_midn1_TachCC01,
 
 jan24_midn_data <- bind_rows(jan24_midn_list)
 
+write.csv(jan24_midn_data, "clean_data/datasets/jan24_midn_data.csv", row.names = FALSE)
 
-##### ODA Site Temporal Subset ----------------------------------------------------------------
+
+
+#### Oda Site Temporal Subset ----------------------------------------------------------------
 
 # Oda
 apr_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "000000", "235999")
