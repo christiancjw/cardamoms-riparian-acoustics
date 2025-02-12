@@ -12,9 +12,27 @@ library(lubridate)
 
 
 # Define Mapping of Sites to Strahler Orders 
-strahler_map <- list("TaChey" = 1, "Arai" = 3, "Stung Oda" = 1,
-                     "KnaongBatSa" = 1, "TaSay" = 4, "Kronomh" = 5, 
-                     "DamFive" = 6, "TangRang" = 6, "Kravanh Bridge" = 5, "PursatTown" = 7)
+strahler_map <- list("TaChey" = 1, 
+                     "Arai" = 3, 
+                     "Stung Oda" = 3,
+                     "KnaongBatSa" = 1, 
+                     "TaSay" = 3, 
+                     "Kronomh" = 3, 
+                     "DamFive" = 5, 
+                     "TangRang" = 4, 
+                     "Kravanh Bridge" = 4, 
+                     "PursatTown" = 5)
+
+disturbance_map <- list("TaChey" = 1, 
+                   "Arai" = 2, 
+                   "Stung Oda" = 3,
+                   "KnaongBatSa" = 1, 
+                   "TaSay" = 3, 
+                   "Kronomh" = 2, 
+                   "DamFive" = 4, 
+                   "TangRang" = 4, 
+                   "Kravanh Bridge" = 5, 
+                   "PursatTown" = 5)
    
 #### Function to clean and export acoustic index data ----
 clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, output_dir = "clean_data") {
@@ -63,9 +81,10 @@ clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, ou
           Site = site,
           Device = device,
           Strahler = strahler_map[[site]],  # Add Strahler order column
+          Disturbance = disturbance_map[[site]],
           Month = month(as.Date(Date, "%Y%m%d"), label = TRUE, abbr = TRUE)  # Add abbreviated month column
         ) %>%
-        select(Site, Device, Date, Time, Strahler, Month, everything())  # Reorder columns
+        select(Site, Device, Date, Time, Strahler, Disturbance, Month, everything())  # Reorder columns
       
       # Define output file path within site/device subfolders
       output_file <- file.path(device_output_dir, paste0(site, "_", device, "_", date_value, "_cleaned.csv"))
