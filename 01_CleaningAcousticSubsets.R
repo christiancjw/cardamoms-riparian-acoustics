@@ -10,8 +10,8 @@ library(readr)
   # write_csv(): Used to save clean data more efficiently than base R write.csv()
 library(lubridate)
 
-
-# Define Mapping of Sites to Strahler Orders 
+Corrected strahler orders. Added disturbance index
+# Define Mapping of Sites to Strahler Orders extracted using PCRaster in QGIS
 strahler_map <- list("TaChey" = 1, 
                      "Arai" = 3, 
                      "Stung Oda" = 3,
@@ -23,6 +23,9 @@ strahler_map <- list("TaChey" = 1,
                      "Kravanh Bridge" = 4, 
                      "PursatTown" = 5)
 
+
+# Define Mapping of Sites to disturbance index: 
+# (1 = Undisturbed, 2 = Regenerating, 3 = Trail Stop, 4 = Modified with natural vegetation, 5 = Heavily Modified, no natural vegetation)
 disturbance_map <- list("TaChey" = 1, 
                    "Arai" = 2, 
                    "Stung Oda" = 3,
@@ -35,7 +38,7 @@ disturbance_map <- list("TaChey" = 1,
                    "PursatTown" = 5)
    
 #### Function to clean and export acoustic index data ----
-clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, output_dir = "clean_data") {
+clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, output_dir = "clean_data/daily_indices") {
   
   # Convert start and end dates to Date format
   start_date <- as.Date(start_date, "%Y%m%d")
