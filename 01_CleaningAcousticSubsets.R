@@ -10,7 +10,6 @@ library(readr)
   # write_csv(): Used to save clean data more efficiently than base R write.csv()
 library(lubridate)
 
-Corrected strahler orders. Added disturbance index
 # Define Mapping of Sites to Strahler Orders extracted using PCRaster in QGIS
 strahler_map <- list("TaChey" = 1, 
                      "Arai" = 3, 
