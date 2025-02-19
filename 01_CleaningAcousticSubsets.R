@@ -17,7 +17,7 @@ strahler_map <- list("TaChey" = 1,
                      "KnaongBatSa" = 1, 
                      "TaSay" = 3, 
                      "Kronomh" = 3, 
-                     "DamFive" = 5, 
+                     "DamFive" = 4, 
                      "TangRang" = 4, 
                      "Kravanh Bridge" = 4, 
                      "PursatTown" = 5)
@@ -35,6 +35,18 @@ disturbance_map <- list("TaChey" = 1,
                    "TangRang" = 4, 
                    "Kravanh Bridge" = 5, 
                    "PursatTown" = 5)
+
+# Define Mapping of Sites to Branch: 
+branch_map <- list("TaChey" = 1, 
+                        "Arai" = 1, 
+                        "Stung Oda" = 1,
+                        "KnaongBatSa" = 2, 
+                        "TaSay" = 2, 
+                        "Kronomh" = 2, 
+                        "DamFive" = 2, 
+                        "TangRang" = 3, 
+                        "Kravanh Bridge" = 3, 
+                        "PursatTown" = 3)
    
 #### Function to clean and export acoustic index data ----
 clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, output_dir = "clean_data/daily_indices") {
@@ -79,11 +91,12 @@ clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, ou
         filter(!str_detect(FileName, "<missing row>")) %>%
         mutate(
           Date = substr(FileName, 1, 8),  # Extract YYYYMMDD from FileName
-          Time = substr(FileName, 10, 15),  # Extract HHMMSS from FileName
+          Time = sprintf("%06d", as.numeric(substr(FileName, 10, 15))),  # Format time as HHMMSS
           Site = site,
           Device = device,
           Strahler = strahler_map[[site]],  # Add Strahler order column
-          Disturbance = disturbance_map[[site]],
+          Disturbance = disturbance_map[[site]], 
+          Branch = branch_map[[site]],
           Month = month(as.Date(Date, "%Y%m%d"), label = TRUE, abbr = TRUE)  # Add abbreviated month column
         ) %>%
         select(Site, Device, Date, Time, Strahler, Disturbance, Month, everything())  # Reorder columns
