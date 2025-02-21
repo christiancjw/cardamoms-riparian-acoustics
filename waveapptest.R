@@ -72,49 +72,62 @@ ui <- fluidPage(
     tags$script(src = "js/wavesurfer.min.js"),
     tags$script(src = "js/spectrogram.min.js"),
     # Custom CSS for Styling Waveform and Spectrogram display
-    tags$style(HTML("#waveform { 
-                    width: 100% !important; 
-                    height: 100px !important; 
-                    margin-top: 10px; 
-                    border: 1px solid #ccc; 
-                    } 
-                    #spectrogram { 
-                    width: 100% !important; 
-                    height: 150px !important; 
-                    margin-top: 10px; 
-                    border: 1px solid #ccc; 
-                    } 
-                    #now_playing { 
-                    margin-top: 20px; 
-                    padding: 10px; 
-                    background-color: #f9f9f9; 
-                    border: 1px solid #ccc; 
-                    font-size: 14px; w
-                    idth: 100%; 
-                    }"))
+    tags$style(HTML("
+          /* Existing styles */
+          #waveform {
+            width: 100% !important;
+            height: 100px !important;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+          }
+        
+          #spectrogram {
+            width: 100% !important;
+            height: 150px !important;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+          }
+        
+          #now_playing {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            width: 100%;
+          }
+        "))
   ),
   # Main PCA plot - spans both the sidebar and main panel
   fluidRow(
-    column(12, plotlyOutput("pca_plot", height = "700px"))
+    column(12, plotlyOutput("pca_plot", height = "800px"))
   ),
   # UI Controls and Audio Visualization. Seems like 12 is max width. Structured around that.
-  fluidRow(
-    column(3, 
-           selectInput("selected_month", "Choose a Month:", choices = months),
-           selectInput("selected_time", "Choose a Time Range:", choices = names(time_ranges)),
-           selectInput("selected_indices", "Choose Acoustic Indices:", choices = acoustic_indices, multiple = TRUE)
-    ),
-    column(3, 
-           actionButton("run_pca", "Run PCA", class = "btn-primary"),
-           actionButton("play_pause", "Play / Pause", class = "btn-primary"),
-           div(id = "now_playing", "Now Playing: ") # Placeholder for "Now Playing" 
-    ),
-    column(6, 
+  absolutePanel(
+    top = 10, left = 10, 
+    width = 300, height = "auto",
+    style = "z-index: 1000; background-color: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 5px;",
+    selectInput("selected_month", "Choose a Month:", choices = months),
+    selectInput("selected_time", "Choose a Time Range:", choices = names(time_ranges)),
+    selectInput("selected_indices", "Choose Acoustic Indices:", choices = acoustic_indices, multiple = TRUE),
+    actionButton("run_pca", "Run PCA", class = "btn-primary"),
+    actionButton("play_pause", "Play / Pause", class = "btn-primary")
+  ),
+    column(8,
            div(id = "waveform"), # Placeholder for waveform display
            div(id = "spectrogram") # Placeholder for spectrogram display
-    )
+    ),
+  
+  fluidRow(column(4,
+                  div(id = "now_playing", "Now Playing: "), # Placeholder for "Now Playing" 
+                  tabsetPanel(
+                    tabPanel("PCA Summary", verbatimTextOutput("pca_summary")),
+                    tabPanel("Loadings", verbatimTextOutput("pca_loadings"))
+                  )
   )
-)
+  ),
+  )
+
 
 # Server - Handles data processing, PCA computation, and audio playback
 server <- function(input, output, session) {
@@ -133,6 +146,36 @@ server <- function(input, output, session) {
       subset(data, Time >= time_range[1] & Time <= time_range[2])
     }
   })
+  
+  
+  # Create output for PCA summary and loadings
+  pca_results <- eventReactive(input$run_pca, {
+    data <- filtered_data()
+    pca_data <- data %>% select(all_of(input$selected_indices))
+    data_scaled <- scale(pca_data)  # Standardize data before PCA
+    prcomp(data_scaled, center = TRUE, scale. = TRUE)
+  })
+  
+  output$pca_summary <- renderPrint({
+    pca_res <- pca_results()
+    if (!is.null(pca_res)) summary(pca_res)
+  })
+  
+  output$pca_loadings <- renderPrint({
+    pca_res <- pca_results()
+    if (!is.null(pca_res)) {
+      # Get the PCA loadings (rotation matrix)
+      loadings <- pca_res$rotation
+      
+      # Sort the loadings by the absolute value of each component in descending order
+      sorted_loadings <- loadings[order(-abs(loadings[, 1])), ]  # Example for sorting by first principal component (PC1)
+      
+      # Print the sorted loadings
+      print(sorted_loadings)
+    }
+  })
+  
+  
   # Perform PCA when user clicks "Run PCA"
   pca_results <- eventReactive(input$run_pca, {
     data <- filtered_data()
@@ -147,7 +190,7 @@ server <- function(input, output, session) {
     site_colormap <- site_colors[filtered_data()$Site] # Assign colors based on site names
     plot_ly(scores, x = ~PC1, y = ~PC2, z = ~PC3,
             color = ~factor(filtered_data()$Site, levels = site_order),  # Orders legend
-            colors = site_colors,  # Ensures same colors per site
+            colors = site_colors, # Ensures same colors per site
             text = ~paste(
               "Site:", filtered_data()$Site, 
               "<br>Time:", filtered_data()$Time, 
@@ -160,15 +203,17 @@ server <- function(input, output, session) {
                          filtered_data()$Date, "_", 
                          sapply(filtered_data()$Time, format_time_for_seeking), ".wav", sep = ""), # Time formatted to HHMMSS for seeking
             type = 'scatter3d', mode = 'markers', marker = list(size = 2, color = site_colormap)) %>% 
-    layout(
-      legend = list(
-        title = list(text = "Sites"),
-        x = 1.05,  # Moves legend to the right
-        y = 1,  
-        traceorder = "normal",  # Keeps order as defined in site_order
-        bgcolor = "rgba(255,255,255,0.5)"  # Semi-transparent background
+      layout(
+        legend = list(
+          title = list(text = "Sites"),
+          x = 1.05,  # Moves legend to the right
+          y = 1,  
+          traceorder = "normal",  # Keeps order as defined in site_order
+          bgcolor = "rgba(255,255,255,0.5)",  # Semi-transparent background
+          itemwidth = 20,  # Increase the width of legend items
+          itemsizing = "constant"  # Ensure legend item size remains constant
+        )
       )
-    )
   })
 
   # Detect click on PCA plot and update audio
