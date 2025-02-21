@@ -11,8 +11,8 @@ apr24_fullday_data <- read.csv("clean_data/Datasets/apr24_fullday_data.csv")
 # Store datasets in a named list
 datasets <- list(
   "November 2023" = nov23_fullday_data,
-  "January 2024" = nov23_fullday_data,
-  "April 2024" = nov23_fullday_data
+  "January 2024" = jan24_fullday_data,
+  "April 2024" = apr24_fullday_data
 )
 
 # Define available months, time-ranges, and acoustic indices

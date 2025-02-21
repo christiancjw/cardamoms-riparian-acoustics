@@ -3,14 +3,24 @@ library(plotly)
 library(dplyr)
 library(shinyjs)
 
+
+
 # Store datasets in a named list
-pca_datasets <- list("November Full Soundscapes" = nov_pca_scores, "November Dawn Chorus" = nov_dawn_pca_scores,
-                     "November Midday Soundscapes" = nov_pca_scores, "November Dusk Chorus" = nov_dawn_pca_scores,
-                     "November Midnight Soundscapes" = nov_midd_pca_scores, 
-                     "January Full Soundscapes" = jan_pca_scores, "January Dawn Chorus" = jan_dawn_pca_scores, 
-                     "January Midday Soundscapes" = jan_pca_scores, "January Dusk Chorus" = jan_dawn_pca_scores,
-                     "January Midnight Soundscapes" = jan_midd_pca_scores, 
+pca_datasets <- list("November 2023 Full Soundscapes" = nov23_pca_scores, "November 2023 Dawn Chorus" = nov23_dawn_pca_scores,
+                     "November 2023 Midday Soundscapes" = nov23_pca_scores, "November 2023 Dusk Chorus" = nov23_dusk_pca_scores,
+                     "November 2023 Midnight Soundscapes" = nov23_midn_pca_scores, 
+                     "January 2024 Full Soundscapes" = jan24_pca_scores, "January 2024 Dawn Chorus" = jan24_dawn_pca_scores, 
+                     "January 2024 Midday Soundscapes" = jan24_midd_pca_scores, "January 2024 Dusk Chorus" = jan24_dusk_pca_scores,
+                     "January 2024 Midnight Soundscapes" = jan24_midn_pca_scores, 
+                     "April 2024 Full Soundscapes" = apr24_pca_scores, "April 2024 Dawn Chorus" = apr24_dawn_pca_scores, 
+                     "April 2024 Midday Soundscapes" = apr24_midd_pca_scores, "April 2024 Dusk Chorus" = apr24_dusk_pca_scores,
+                     "April 2024 Midnight Soundscapes" = apr24_midn_pca_scores, 
                      "")
+
+# Function to format time from seconds to HHMMSS
+format_time <- function(time) {
+  sprintf("%06d", as.integer(time))
+}
 
 # UI
 ui <- fluidPage(
@@ -83,7 +93,7 @@ server <- function(input, output, session) {
                           "<br>Date:", Date,
                           "<br>Device:", Device),
             key = ~paste("http://localhost:8000/", Site, "/", Device, "/",
-                         Date, "/", Date, "_", substr(Time, 1, 2), substr(Time, 3, 4), "00.wav", sep = ""),
+                         Date, "/", Date, "_", format_time(Time), ".wav", sep = ""),
             type = 'scatter3d',
             mode = 'markers',
             marker = list(size = 2))
