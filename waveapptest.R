@@ -77,19 +77,19 @@ ui <- fluidPage(
           #waveform {
             width: 100% !important;
             height: 100px !important;
-            margin-top: 10px;
+            margin-top: 0px;
             border: 1px solid #ccc;
           }
         
           #spectrogram {
             width: 100% !important;
             height: 150px !important;
-            margin-top: 10px;
+            margin-top: 0px;
             border: 1px solid #ccc;
           }
         
           #now_playing {
-            margin-top: 20px;
+            margin-top: 0px;
             padding: 10px;
             background-color: #f9f9f9;
             border: 1px solid #ccc;
@@ -100,7 +100,7 @@ ui <- fluidPage(
   ),
   # Main PCA plot - spans both the sidebar and main panel
   fluidRow(
-    column(12, plotlyOutput("pca_plot", height = "800px"))
+    column(12, plotlyOutput("pca_plot", height = "750px"))
   ),
   # UI Controls and Audio Visualization. Seems like 12 is max width. Structured around that.
   absolutePanel(
@@ -188,6 +188,7 @@ server <- function(input, output, session) {
     pca_data <- pca_results()
     scores <- as.data.frame(pca_data$x)
     site_colormap <- site_colors[filtered_data()$Site] # Assign colors based on site names
+    
     plot_ly(scores, x = ~PC1, y = ~PC2, z = ~PC3,
             color = ~factor(filtered_data()$Site, levels = site_order),  # Orders legend
             colors = site_colors, # Ensures same colors per site
@@ -195,23 +196,32 @@ server <- function(input, output, session) {
               "Site:", filtered_data()$Site, 
               "<br>Time:", filtered_data()$Time, 
               "<br>Date:", filtered_data()$Date, 
-              "<br>Device:", filtered_data()$Device), 
+              "<br>Device:", filtered_data()$Device),
             key = ~paste("http://localhost:8000/", 
                          filtered_data()$Site, "/", 
                          filtered_data()$Device, "/", 
                          filtered_data()$Date, "/", 
                          filtered_data()$Date, "_", 
                          sapply(filtered_data()$Time, format_time_for_seeking), ".wav", sep = ""), # Time formatted to HHMMSS for seeking
-            type = 'scatter3d', mode = 'markers', marker = list(size = 2, color = site_colormap)) %>% 
+            type = 'scatter3d', mode = 'markers', marker = list(size = 5, alpha = 0.1, color = site_colormap)) %>% 
       layout(
         legend = list(
           title = list(text = "Sites"),
-          x = 1.05,  # Moves legend to the right
-          y = 1,  
+          x = 1,  # Center legend horizontally
+          y = 1,  # Center legend vertically
+          xanchor = "center",
+          yanchor = "middle",
           traceorder = "normal",  # Keeps order as defined in site_order
           bgcolor = "rgba(255,255,255,0.5)",  # Semi-transparent background
           itemwidth = 20,  # Increase the width of legend items
-          itemsizing = "constant"  # Ensure legend item size remains constant
+          itemsizing = "constant",  # Ensure legend item size remains constant
+          orientation = "v"  # Horizontal legend
+        ),
+        margin = list(l = 0, r = 0, t = 0, b = 0),  # Remove margins to make the plot stretch across the full width
+        scene = list(
+          xaxis = list(title = "PC1"),
+          yaxis = list(title = "PC2"),
+          zaxis = list(title = "PC3")
         )
       )
   })
