@@ -6,9 +6,6 @@ library(cowplot)
 #### Data Read in ------------------
 
 # November Data Reading 
-nov23_fullday_data <- read.csv("clean_data/Datasets/nov23_fullday_data.csv", colClasses = c("Time" = "character"))
-nov23_dawn_data <- read.csv("clean_data/Datasets/nov23_dawn_data.csv", colClasses = c("Time" = "character"))
-
 nov23_fullday_data <- read.csv("clean_data/Datasets/nov23_fullday_data.csv")
 nov23_dawn_data <- read.csv("clean_data/Datasets/nov23_dawn_data.csv")
 nov23_midd_data <- read.csv("clean_data/Datasets/nov23_midd_data.csv")
@@ -341,14 +338,13 @@ plot_jan24_full <- ggplot(jan24_pca_scores, aes(x = PC1, y = PC2, color = Site))
   labs(title = "PCA of Full Day Indices (January 2024)") + 
   stat_ellipse(aes(colour = Site), type = "norm", level = 0.4) +
   theme_minimal() + xlim(-5, 10) + ylim(-6, 6) + 
-  
-  geom_segment(data = nov23_loadings_df, 
+  geom_segment(data = jan24_loadings_df, 
                aes(x = 0, y = 0, xend = PC1 * scale_factor, yend = PC2 * scale_factor),
                arrow = arrow(length = unit(0.2, "inches")),
               color = "#2d2d2d", linewidth = 1, alpha = 0.7) +
 
 # Add labels for loadings
-  geom_text(data = nov23_loadings_df, aes(x = PC1 * scale_factor, y = PC2 * scale_factor, label = Index),
+  geom_text(data = jan24_loadings_df, aes(x = PC1 * scale_factor, y = PC2 * scale_factor, label = Index),
           color = "#2d2d2d", size = 3, vjust = -0.5, hjust = -0.3) 
 
 plot_jan24_full
