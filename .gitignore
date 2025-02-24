@@ -54,3 +54,4 @@ rsconnect/
 # Data folder
 raw_data/
 clean_data/
+figures/
