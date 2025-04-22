@@ -6,7 +6,9 @@ library(lubridate)
 
 #### Data Read in ------------------
 nov23_fullday_data <- read.csv("clean_data/Datasets/nov23_fullday_data.csv")
-
+jan24_fullday_data <- read.csv("clean_data/Datasets/jan24_fullday_data.csv")
+apr24_fullday_data <- read.csv("clean_data/Datasets/apr24_fullday_data.csv")
+jun24_fullday_data <- read.csv("clean_data/Datasets/jun24_fullday_data.csv")
 
 #### Function to run subset PCAs --------------------
 
@@ -109,7 +111,6 @@ bind_metadata <- function(pca_result, original_data, start_time = NULL, end_time
   
   return(pca_scores_with_metadata)
 }
-
 
 # November 2023 PCAs ------------------------------------------------------------------------
 nov23_fullday_pca <- run_pca_subset(nov23_fullday_data, "00:00:00", "23:59:00")

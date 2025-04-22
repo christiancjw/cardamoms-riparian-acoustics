@@ -99,11 +99,8 @@ clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, ou
           Site = site,
           Device = device,
           Strahler = strahler_map[[site]],  # Add Strahler order column
-<<<<<<< HEAD:analysis_scripts/01_CleaningAcousticSubsets.R
           QBR_Score = QBR_map[[site]], 
-=======
           Disturbance = disturbance_map[[site]], 
->>>>>>> 3c6660d (Rewrote code to output full HHMMSS and not remove inital 0s from early times):01_CleaningAcousticSubsets.R
           Branch = branch_map[[site]],
           Month = month(as.Date(Date, "%Y%m%d"), label = TRUE, abbr = TRUE)  # Add abbreviated month column
         ) %>%
