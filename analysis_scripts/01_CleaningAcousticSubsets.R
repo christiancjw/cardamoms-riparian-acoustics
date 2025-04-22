@@ -10,7 +10,7 @@ library(readr)
   # write_csv(): Used to save clean data more efficiently than base R write.csv()
 library(lubridate)
 
-# Define Mapping of Sites to Strahler Orders extracted using PCRaster in QGIS
+# Define Mapping of Sites to Strahler Orders extracted using PCRaster in QGIS --------------
 strahler_map <- list("TaChey" = 1, 
                      "Arai" = 3, 
                      "Stung Oda" = 3,
@@ -25,15 +25,15 @@ strahler_map <- list("TaChey" = 1,
 
 # Define Mapping of Sites to disturbance index: 
 # (1 = Undisturbed, 2 = Regenerating, 3 = Trail Stop, 4 = Modified with natural vegetation, 5 = Heavily Modified, no natural vegetation)
-disturbance_map <- list("TaChey" = 1, 
-                   "Arai" = 2, 
-                   "Stung Oda" = 3,
-                   "KnaongBatSa" = 1, 
-                   "TaSay" = 3, 
-                   "Kronomh" = 2, 
-                   "DamFive" = 4, 
-                   "TangRang" = 4, 
-                   "Kravanh Bridge" = 5, 
+QBR_map <- list("TaChey" = 100, 
+                   "Arai" = 95, 
+                   "Stung Oda" = 80,
+                   "KnaongBatSa" = 100, 
+                   "TaSay" = 95, 
+                   "Kronomh" = 75, 
+                   "DamFive" = 40, 
+                   "TangRang" = 40, 
+                   "Kravanh Bridge" = 0, 
                    "PursatTown" = 5)
 
 # Define Mapping of Sites to Branch: 
@@ -49,6 +49,9 @@ branch_map <- list("TaChey" = 1,
                         "PursatTown" = 3)
    
 #### Function to clean and export acoustic index data ----
+#### Input being concatenated files produced by AcousticAnalyses Python Program - pulls towsey acoustic indices out
+#### This function allows you to remove (missing no. columns due to time sub-sampling)
+#### Also adds metadata such as disturbance, strahler order
 clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, output_dir = "clean_data/daily_indices") {
   
   # Convert start and end dates to Date format
@@ -68,10 +71,11 @@ clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, ou
   
   # Ensure output directory exists (create site and device folders)
   site_output_dir <- file.path(output_dir, site)
-    if (!dir.exists(site_output_dir)) dir.create(site_output_dir)
+    if (!dir.exists(site_output_dir)) dir.create(site_output_dir, recursive = TRUE, showWarnings = FALSE)
+
   
   device_output_dir <- file.path(site_output_dir, device)
-   if (!dir.exists(device_output_dir)) dir.create(device_output_dir)
+   if (!dir.exists(device_output_dir)) dir.create(device_output_dir, recursive = TRUE, showWarnings = FALSE)
   
   # Process each valid folder
   for (folder in valid_folders) {
@@ -95,11 +99,15 @@ clean_acoustic_data <- function(base_dir, site, device, start_date, end_date, ou
           Site = site,
           Device = device,
           Strahler = strahler_map[[site]],  # Add Strahler order column
+<<<<<<< HEAD:analysis_scripts/01_CleaningAcousticSubsets.R
+          QBR_Score = QBR_map[[site]], 
+=======
           Disturbance = disturbance_map[[site]], 
+>>>>>>> 3c6660d (Rewrote code to output full HHMMSS and not remove inital 0s from early times):01_CleaningAcousticSubsets.R
           Branch = branch_map[[site]],
           Month = month(as.Date(Date, "%Y%m%d"), label = TRUE, abbr = TRUE)  # Add abbreviated month column
         ) %>%
-        select(Site, Device, Date, Time, Strahler, Disturbance, Month, everything())  # Reorder columns
+        select(Site, Device, Date, Time, Strahler, QBR_Score, Month, everything())  # Reorder columns
       
       # Define output file path within site/device subfolders
       output_file <- file.path(device_output_dir, paste0(site, "_", device, "_", date_value, "_cleaned.csv"))

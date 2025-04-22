@@ -7,12 +7,14 @@ library(shinyjs)
 nov23_fullday_data <- read.csv("clean_data/Datasets/nov23_fullday_data.csv")
 jan24_fullday_data <- read.csv("clean_data/Datasets/jan24_fullday_data.csv")
 apr24_fullday_data <- read.csv("clean_data/Datasets/apr24_fullday_data.csv")
+jun24_fullday_data <- read.csv("clean_data/Datasets/jun24_fullday_data.csv")
 
 # Store datasets in a named list
 datasets <- list(
   "November 2023" = nov23_fullday_data,
   "January 2024" = jan24_fullday_data,
-  "April 2024" = apr24_fullday_data
+  "April 2024" = apr24_fullday_data,
+  "June 2024" = jun24_fullday_data
 )
 
 # Function to add leading zeros to time values for seeking audio files
@@ -28,9 +30,11 @@ jan24_fullday_data <- jan24_fullday_data %>%
   mutate(Time = as.numeric(Time))
 apr24_fullday_data <- apr24_fullday_data %>%
   mutate(Time = as.numeric(Time))
+jun24_fullday_data <- jun24_fullday_data %>%
+  mutate(Time = as.numeric(Time))
 
 # Define available month datasets
-months <- c("November 2023", "January 2024", "April 2024")
+months <- c("November 2023", "January 2024", "April 2024", "June 2024")
 
 # Define available time-ranges, and acoustic indices
 time_ranges <- list(

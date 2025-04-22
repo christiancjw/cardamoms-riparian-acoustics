@@ -53,9 +53,6 @@ head(unique(CI07$Date)) # Check available dates
 head(unique(CI07$Time)) # Check available times
 
 
-
-
-
 # Notes -------
 ## Removed CC09 from Pursat - was not recording properly
 ## Removed CC12 From Tasay - Not recording properly 
@@ -63,24 +60,24 @@ head(unique(CI07$Time)) # Check available times
 #### November 2023 Full Day Subsets  -----------------------------------------------------------------
 
 # Arai
-nov_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231129", "000000", "235999")
-nov_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231129", "000000", "235999")
+nov_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231202", "000000", "235999")
+nov_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231202", "000000", "235999")
 
 # Oda
-nov_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "000000", "235999")
-nov_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "000000", "235999")
+nov_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231202", "000000", "235999")
+nov_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231202", "000000", "235999")
 
 # Tang Rang Bridge
 nov_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "000000", "235999")
-nov_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "000000", "235999")
+nov_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231202", "000000", "235999")
 
 # Kravanh
-nov_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231129", "000000", "235999")
-nov_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231129", "000000", "235999")
+nov_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231202", "000000", "235999")
+nov_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231202", "000000", "235999")
 
 # Pursat
-nov_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "000000", "235999")
-nov_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "000000", "235999")
+nov_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231202", "000000", "235999")
+nov_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231202", "000000", "235999")
 
 # Combine Dataframe for November 2023 Full Days
 nov23_fullday_list <- list(nov_AraiCI02, nov_AraiCI14, 
@@ -99,24 +96,24 @@ write.csv(nov23_fullday_data, "clean_data/datasets/nov23_fullday_data.csv", row.
 #### November 2023 Dawn Chorus Subset -----------------------------------------------------------------
 
 # Arai 
-nov_dawn_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231129", "050000", "090000")
-nov_dawn_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231129", "050000", "090000")
+nov_dawn_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231202", "050000", "090000")
+nov_dawn_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231202", "050000", "090000")
 
 # Oda
-nov_dawn_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "050000", "090000")
-nov_dawn_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "050000", "090000")
+nov_dawn_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231202", "050000", "090000")
+nov_dawn_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231202", "050000", "090000")
 
 # Tang Rang Bridge
 nov_dawn_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "050000", "090000")
-nov_dawn_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "050000", "090000")
+nov_dawn_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231202", "050000", "090000")
 
 # Kravanh
-nov_dawn_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231129", "050000", "090000")
-nov_dawn_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231129", "050000", "090000")
+nov_dawn_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231202", "050000", "090000")
+nov_dawn_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231202", "050000", "090000")
 
 # Pursat
-nov_dawn_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "050000", "090000")
-nov_dawn_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "050000", "090000")
+nov_dawn_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231202", "050000", "090000")
+nov_dawn_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231202", "050000", "090000")
 
 # Combine Dataframe for November 2023 Dawn Choruses
 nov23_dawn_list <- list(nov_dawn_AraiCI02, nov_dawn_AraiCI14,
@@ -130,24 +127,24 @@ write.csv(nov23_dawn_data, "clean_data/datasets/nov23_dawn_data.csv", row.names 
 
 #### November Midday Subset ---------------------------------------------
 # Arai 
-nov_midd_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231129", "103000", "143000")
-nov_midd_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231129", "103000", "143000")
+nov_midd_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231202", "103000", "143000")
+nov_midd_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231202", "103000", "143000")
 
 # Oda
-nov_midd_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "103000", "143000")
-nov_midd_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "103000", "143000")
+nov_midd_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231202", "103000", "143000")
+nov_midd_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231202", "103000", "143000")
 
 # Tang Rang Bridge
 nov_midd_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "103000", "143000")
-nov_midd_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "103000", "143000")
+nov_midd_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231202", "103000", "143000")
 
 # Kravanh
-nov_midd_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231129", "103000", "143000")
-nov_midd_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231129", "103000", "143000")
+nov_midd_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231202", "103000", "143000")
+nov_midd_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231202", "103000", "143000")
 
 # Pursat
-nov_midd_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "103000", "143000")
-nov_midd_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "103000", "143000")
+nov_midd_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231202", "103000", "143000")
+nov_midd_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231202", "103000", "143000")
 
 # Combine Dataframe for November 2023 Dawn Choruses
 nov23_midd_list <- list(nov_midd_AraiCI02, nov_midd_AraiCI14,
@@ -163,24 +160,24 @@ write.csv(nov23_midd_data, "clean_data/datasets/nov23_midd_data.csv", row.names 
 #### November Dusk Chorus Subset ---------------------------------------------
 
 # Arai 
-nov_dusk_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231129", "153000", "193000")
-nov_dusk_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231129", "153000", "193000")
+nov_dusk_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231202", "153000", "193000")
+nov_dusk_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231202", "153000", "193000")
 
 # Oda
-nov_dusk_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "153000", "193000")
-nov_dusk_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "153000", "193000")
+nov_dusk_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231202", "153000", "193000")
+nov_dusk_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231202", "153000", "193000")
 
 # Tang Rang Bridge
 nov_dusk_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "153000", "193000")
-nov_dusk_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "153000", "193000")
+nov_dusk_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231202", "153000", "193000")
 
 # Kravanh
-nov_dusk_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231129", "153000", "193000")
-nov_dusk_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231129", "153000", "193000")
+nov_dusk_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231202", "153000", "193000")
+nov_dusk_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231202", "153000", "193000")
 
 # Pursat
-nov_dusk_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "153000", "193000")
-nov_dusk_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "153000", "193000")
+nov_dusk_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231202", "153000", "193000")
+nov_dusk_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231202", "153000", "193000")
 
 # Combine Dataframe for November 2023 Dawn Choruses
 nov23_dusk_list <- list(nov_dusk_AraiCI02, nov_dusk_AraiCI14,
@@ -196,37 +193,37 @@ write.csv(nov23_dusk_data, "clean_data/datasets/nov23_dusk_data.csv", row.names 
 #### November Midnight Subset ---------------------------------------------
 
 # Arai 
-nov_midn1_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231129", "000000", "020000")
-nov_midn2_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231129", "220000", "235900")
-nov_midn1_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231129", "000000", "020000")
-nov_midn2_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231129", "220000", "235900")
+nov_midn1_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231202", "000000", "020000")
+nov_midn2_AraiCI02 <- subset_data_by_time_and_date(CI02, "20231123", "20231202", "220000", "235900")
+nov_midn1_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231202", "000000", "020000")
+nov_midn2_AraiCI14 <- subset_data_by_time_and_date(CI14, "20231123", "20231202", "220000", "235900")
 
 # Oda
-nov_midn1_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "000000", "020000")
-nov_midn2_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231129", "220000", "235900")
-nov_midn1_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "000000", "020000")
-nov_midn2_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231129", "220000", "235900")
+nov_midn1_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231202", "000000", "020000")
+nov_midn2_OdaCI01 <- subset_data_by_time_and_date(CI01, "20231123", "20231202", "220000", "235900")
+nov_midn1_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231202", "000000", "020000")
+nov_midn2_OdaCI13 <- subset_data_by_time_and_date(CI13, "20231123", "20231202", "220000", "235900")
 
 
 # Tang Rang Bridge
 nov_midn1_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "000000", "020000")
 nov_midn2_TRangCC07 <- subset_data_by_time_and_date(CC07, "20231123", "20231129", "220000", "235900")
-nov_midn1_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "000000", "020000")
-nov_midn2_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231129", "220000", "235900")
+nov_midn1_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231202", "000000", "020000")
+nov_midn2_TRangCI07 <- subset_data_by_time_and_date(CI07, "20231123", "20231202", "220000", "235900")
 
 
 # Kravanh
-nov_midn1_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231129", "000000", "020000")
-nov_midn2_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231129", "220000", "235900")
-nov_midn1_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231129", "000000", "020000")
-nov_midn2_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231129", "220000", "235900")
+nov_midn1_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231202", "000000", "020000")
+nov_midn2_KraCC08 <- subset_data_by_time_and_date(CC08, "20231123", "20231202", "220000", "235900")
+nov_midn1_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231202", "000000", "020000")
+nov_midn2_KraCI08 <- subset_data_by_time_and_date(CI08, "20231123", "20231202", "220000", "235900")
 
 
 # Pursat
-nov_midn1_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "000000", "020000")
-nov_midn2_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231129", "220000", "235900")
-nov_midn1_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "000000", "020000")
-nov_midn2_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231129", "220000", "235900")
+nov_midn1_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231202", "000000", "020000")
+nov_midn2_PurCC09 <- subset_data_by_time_and_date(CC09, "20231123", "20231202", "220000", "235900")
+nov_midn1_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231202", "000000", "020000")
+nov_midn2_PurCI09 <- subset_data_by_time_and_date(CI09, "20231123", "20231202", "220000", "235900")
 
 
 # Combine Dataframe for November 2023 Dawn Choruses
@@ -512,37 +509,37 @@ write.csv(jan24_midn_data, "clean_data/datasets/jan24_midn_data.csv", row.names 
 #### April 2024 Full Day Subset ------------------------------------------------------------------------------------------
 
 # Ta Chey
-apr_TachCI10 <- subset_data_by_time_and_date(CI10, "20240408", "20240414", "000000", "235999")
-apr_TachCC01 <- subset_data_by_time_and_date(CC01, "20240408", "20240414", "000000", "235999")
+apr_TachCI10 <- subset_data_by_time_and_date(CI10, "20240405", "20240414", "000000", "235999")
+apr_TachCC01 <- subset_data_by_time_and_date(CC01, "20240405", "20240414", "000000", "235999")
 
 # Arai
-apr_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240408", "20240414", "000000", "235999")
+apr_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240405", "20240414", "000000", "235999")
 
 # Oda
-apr_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240408", "20240414", "000000", "235999")
-apr_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240408", "20240414", "000000", "235999")
+apr_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "000000", "235999")
+apr_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "000000", "235999")
 
 # Knaong Bat Sa
-apr_BatCI17 <- subset_data_by_time_and_date(CI17, "20240408", "20240414", "000000", "235999")
+apr_BatCI17 <- subset_data_by_time_and_date(CI17, "20240408", "20240417", "000000", "235999")
 
 # Ta Say
-apr_TasCI12 <- subset_data_by_time_and_date(CI12, "20240408", "20240414", "000000", "235999")
+apr_TasCI12 <- subset_data_by_time_and_date(CI12, "20240407", "20240416", "000000", "235999")
 
 # Kronomh
-apr_KroCI19 <- subset_data_by_time_and_date(CI19, "20240408", "20240414", "000000", "235999")
-apr_KroCI20 <- subset_data_by_time_and_date(CI20, "20240408", "20240414", "000000", "235999")
+apr_KroCI19 <- subset_data_by_time_and_date(CI19, "20240407", "20240416", "000000", "235999")
+apr_KroCI20 <- subset_data_by_time_and_date(CI20, "20240407", "20240416", "000000", "235999")
 
 # Dam Five
-apr_DamCC11 <- subset_data_by_time_and_date(CC11, "20240408", "20240414", "000000", "235999")
-apr_DamCI11 <- subset_data_by_time_and_date(CI11, "20240408", "20240414", "000000", "235999")
+apr_DamCC11 <- subset_data_by_time_and_date(CC11, "20240407", "20240416", "000000", "235999")
+apr_DamCI11 <- subset_data_by_time_and_date(CI11, "20240407", "20240416", "000000", "235999")
 
 # Tang Rang Bridge
-apr_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240408", "20240414", "000000", "235999")
-apr_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240408", "20240414", "000000", "235999")
+apr_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240405", "20240414", "000000", "235999")
+apr_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240405", "20240414", "000000", "235999")
 
 # Pursat
-apr_PurCC09 <- subset_data_by_time_and_date(CC09, "20240408", "20240414", "000000", "235999")
-apr_PurCI09 <- subset_data_by_time_and_date(CI09, "20240408", "20240414", "000000", "235999")
+apr_PurCC09 <- subset_data_by_time_and_date(CC09, "20240404", "20240413", "000000", "235999")
+apr_PurCI09 <- subset_data_by_time_and_date(CI09, "20240404", "20240413", "000000", "235999")
 
 # Combine Dataframe for April 2024 Full Days
 apr24_fullday_list <- list(apr_TachCI10, apr_TachCC01,
@@ -561,41 +558,91 @@ apr24_fullday_data <- bind_rows(apr24_fullday_list)
 write.csv(apr24_fullday_data, "clean_data/datasets/apr24_fullday_data.csv", row.names = FALSE)
 
 
+#### June 2024 Full Day Subset
+# Ta Chey
+jun_TachCI10 <- subset_data_by_time_and_date(CI10, "20240610", "20240619", "000000", "235999")
+jun_TachCC01 <- subset_data_by_time_and_date(CC01, "20240610", "20240619", "000000", "235999")
+
+# Arai
+jun_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240612", "20240621", "000000", "235999")
+
+# Oda
+jun_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240610", "20240619", "000000", "235999")
+jun_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240610", "20240619", "000000", "235999")
+
+# Knaong Bat Sa
+jun_BatCI17 <- subset_data_by_time_and_date(CI17, "20240616", "20240625", "000000", "235999")
+
+# Ta Say
+jun_TasCI12 <- subset_data_by_time_and_date(CI12, "20240616", "20240625", "000000", "235999")
+
+# Kronomh
+jun_KroCI19 <- subset_data_by_time_and_date(CI19, "20240614", "20240623", "000000", "235999")
+jun_KroCI20 <- subset_data_by_time_and_date(CI20, "20240614", "20240623", "000000", "235999")
+
+# Dam Five
+jun_DamCC11 <- subset_data_by_time_and_date(CC11, "20240614", "20240623", "000000", "235999")
+jun_DamCI11 <- subset_data_by_time_and_date(CI11, "20240614", "20240623", "000000", "235999")
+
+# Tang Rang Bridge
+jun_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240614", "20240623", "000000", "235999")
+jun_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240614", "20240623", "000000", "235999")
+
+# Pursat
+jun_PurCC09 <- subset_data_by_time_and_date(CC09, "20240614", "20240623", "000000", "235999")
+jun_PurCI09 <- subset_data_by_time_and_date(CI09, "20240614", "20240623", "000000", "235999")
+
+# Combine Dataframe for junil 2024 Full Days
+jun24_fullday_list <- list(jun_TachCI10, jun_TachCC01,
+                           jun_AraiCI02,
+                           jun_OdaCI01, jun_OdaCI13, 
+                           jun_BatCI17,
+                           jun_TasCI12,
+                           jun_KroCI19, jun_KroCI20,
+                           jun_DamCC11, jun_DamCI11,
+                           jun_TRangCI07, 
+                           jun_PurCI09)
+
+jun24_fullday_data <- bind_rows(jun24_fullday_list)
+
+# Write CSV for jun_24_fullday_data
+write.csv(jun24_fullday_data, "clean_data/datasets/jun24_fullday_data.csv", row.names = FALSE)
+
 #### April 2024 Dawn Chorus Subset ------------------------------------------------------------------------------------------
 
 
 # Ta Chey
-apr_dawn_TachCI10 <- subset_data_by_time_and_date(CI10, "20240408", "20240414", "050000", "090000")
-apr_dawn_TachCC01 <- subset_data_by_time_and_date(CC01, "20240408", "20240414", "050000", "090000")
+apr_dawn_TachCI10 <- subset_data_by_time_and_date(CI10, "20240405", "20240414", "050000", "090000")
+apr_dawn_TachCC01 <- subset_data_by_time_and_date(CC01, "20240405", "20240414", "050000", "090000")
 
 # Arai
-apr_dawn_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240408", "20240414", "050000", "090000")
+apr_dawn_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240405", "20240414", "050000", "090000")
 
 # Oda
-apr_dawn_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240408", "20240414", "050000", "090000")
-apr_dawn_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240408", "20240414", "050000", "090000")
+apr_dawn_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "050000", "090000")
+apr_dawn_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "050000", "090000")
 
 # Knaong Bat Sa
-apr_dawn_BatCI17 <- subset_data_by_time_and_date(CI17, "20240408", "20240414", "050000", "090000")
+apr_dawn_BatCI17 <- subset_data_by_time_and_date(CI17, "20240405", "20240414", "050000", "090000")
 
 # Ta Say
-apr_dawn_TasCI12 <- subset_data_by_time_and_date(CI12, "20240408", "20240414", "050000", "090000")
+apr_dawn_TasCI12 <- subset_data_by_time_and_date(CI12, "20240405", "20240414", "050000", "090000")
 
 # Kronomh
-apr_dawn_KroCI19 <- subset_data_by_time_and_date(CI19, "20240408", "20240414", "050000", "090000")
-apr_dawn_KroCI20 <- subset_data_by_time_and_date(CI20, "20240408", "20240414", "050000", "090000")
+apr_dawn_KroCI19 <- subset_data_by_time_and_date(CI19, "20240405", "20240414", "050000", "090000")
+apr_dawn_KroCI20 <- subset_data_by_time_and_date(CI20, "20240405", "20240414", "050000", "090000")
 
 # Dam Five
-apr_dawn_DamCC11 <- subset_data_by_time_and_date(CC11, "20240408", "20240414", "050000", "090000")
-apr_dawn_DamCI11 <- subset_data_by_time_and_date(CI11, "20240408", "20240414", "050000", "090000")
+apr_dawn_DamCC11 <- subset_data_by_time_and_date(CC11, "20240405", "20240414", "050000", "090000")
+apr_dawn_DamCI11 <- subset_data_by_time_and_date(CI11, "20240405", "20240414", "050000", "090000")
 
 # Tang Rang Bridge
-apr_dawn_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240408", "20240414", "050000", "090000")
-apr_dawn_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240408", "20240414", "050000", "090000")
+apr_dawn_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240405", "20240414", "050000", "090000")
+apr_dawn_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240405", "20240414", "050000", "090000")
 
 # Pursat
-apr_dawn_PurCC09 <- subset_data_by_time_and_date(CC09, "20240408", "20240414", "050000", "090000")
-apr_dawn_PurCI09 <- subset_data_by_time_and_date(CI09, "20240408", "20240414", "050000", "090000")
+apr_dawn_PurCC09 <- subset_data_by_time_and_date(CC09, "20240405", "20240414", "050000", "090000")
+apr_dawn_PurCI09 <- subset_data_by_time_and_date(CI09, "20240405", "20240414", "050000", "090000")
 
 # Combine Dataframe for April 2024 Dawn
 apr24_dawn_list <- list(apr_dawn_TachCI10, apr_dawn_TachCC01,
@@ -616,37 +663,37 @@ write.csv(apr24_dawn_data, "clean_data/datasets/apr24_dawn_data.csv", row.names 
 #### April 2024 Midday Subset ------------------------------------------------------------------------------------------
 
 # Ta Chey
-apr_midd_TachCI10 <- subset_data_by_time_and_date(CI10, "20240408", "20240414", "103000", "143000")
-apr_midd_TachCC01 <- subset_data_by_time_and_date(CC01, "20240408", "20240414", "103000", "143000")
+apr_midd_TachCI10 <- subset_data_by_time_and_date(CI10, "20240405", "20240414", "103000", "143000")
+apr_midd_TachCC01 <- subset_data_by_time_and_date(CC01, "20240405", "20240414", "103000", "143000")
 
 # Arai
-apr_midd_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240408", "20240414", "103000", "143000")
+apr_midd_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240405", "20240414", "103000", "143000")
 
 # Oda
-apr_midd_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240408", "20240414", "103000", "143000")
-apr_midd_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240408", "20240414", "103000", "143000")
+apr_midd_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "103000", "143000")
+apr_midd_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "103000", "143000")
 
 # Knaong Bat Sa
-apr_midd_BatCI17 <- subset_data_by_time_and_date(CI17, "20240408", "20240414", "103000", "143000")
+apr_midd_BatCI17 <- subset_data_by_time_and_date(CI17, "20240405", "20240414", "103000", "143000")
 
 # Ta Say
-apr_midd_TasCI12 <- subset_data_by_time_and_date(CI12, "20240408", "20240414", "103000", "143000")
+apr_midd_TasCI12 <- subset_data_by_time_and_date(CI12, "20240405", "20240414", "103000", "143000")
 
 # Kronomh
-apr_midd_KroCI19 <- subset_data_by_time_and_date(CI19, "20240408", "20240414", "103000", "143000")
-apr_midd_KroCI20 <- subset_data_by_time_and_date(CI20, "20240408", "20240414", "103000", "143000")
+apr_midd_KroCI19 <- subset_data_by_time_and_date(CI19, "20240405", "20240414", "103000", "143000")
+apr_midd_KroCI20 <- subset_data_by_time_and_date(CI20, "20240405", "20240414", "103000", "143000")
 
 # Dam Five
-apr_midd_DamCC11 <- subset_data_by_time_and_date(CC11, "20240408", "20240414", "103000", "143000")
-apr_midd_DamCI11 <- subset_data_by_time_and_date(CI11, "20240408", "20240414", "103000", "143000")
+apr_midd_DamCC11 <- subset_data_by_time_and_date(CC11, "20240405", "20240414", "103000", "143000")
+apr_midd_DamCI11 <- subset_data_by_time_and_date(CI11, "20240405", "20240414", "103000", "143000")
 
 # Tang Rang Bridge
-apr_midd_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240408", "20240414", "103000", "143000")
-apr_midd_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240408", "20240414", "103000", "143000")
+apr_midd_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240405", "20240414", "103000", "143000")
+apr_midd_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240405", "20240414", "103000", "143000")
 
 # Pursat
-apr_midd_PurCC09 <- subset_data_by_time_and_date(CC09, "20240408", "20240414", "103000", "143000")
-apr_midd_PurCI09 <- subset_data_by_time_and_date(CI09, "20240408", "20240414", "103000", "143000")
+apr_midd_PurCC09 <- subset_data_by_time_and_date(CC09, "20240405", "20240414", "103000", "143000")
+apr_midd_PurCI09 <- subset_data_by_time_and_date(CI09, "20240405", "20240414", "103000", "143000")
 
 # Combine Dataframe for April 2024 Dawn
 apr24_midd_list <- list(apr_midd_TachCI10, apr_midd_TachCC01,
@@ -667,37 +714,37 @@ write.csv(apr24_midd_data, "clean_data/datasets/apr24_midd_data.csv", row.names 
 #### April 2024 Dusk Chorus Subset ------------------------------------------------------------------------------------------
 
 # Ta Chey
-apr_dusk_TachCI10 <- subset_data_by_time_and_date(CI10, "20240408", "20240414", "153000", "193000")
-apr_dusk_TachCC01 <- subset_data_by_time_and_date(CC01, "20240408", "20240414", "153000", "193000")
+apr_dusk_TachCI10 <- subset_data_by_time_and_date(CI10, "20240405", "20240414", "153000", "193000")
+apr_dusk_TachCC01 <- subset_data_by_time_and_date(CC01, "20240405", "20240414", "153000", "193000")
 
 # Arai
-apr_dusk_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240408", "20240414", "153000", "193000")
+apr_dusk_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240405", "20240414", "153000", "193000")
 
 # Oda
-apr_dusk_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240408", "20240414", "153000", "193000")
-apr_dusk_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240408", "20240414", "153000", "193000")
+apr_dusk_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "153000", "193000")
+apr_dusk_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "153000", "193000")
 
 # Knaong Bat Sa
-apr_dusk_BatCI17 <- subset_data_by_time_and_date(CI17, "20240408", "20240414", "153000", "193000")
+apr_dusk_BatCI17 <- subset_data_by_time_and_date(CI17, "20240405", "20240414", "153000", "193000")
 
 # Ta Say
-apr_dusk_TasCI12 <- subset_data_by_time_and_date(CI12, "20240408", "20240414", "153000", "193000")
+apr_dusk_TasCI12 <- subset_data_by_time_and_date(CI12, "20240405", "20240414", "153000", "193000")
 
 # Kronomh
-apr_dusk_KroCI19 <- subset_data_by_time_and_date(CI19, "20240408", "20240414", "153000", "193000")
-apr_dusk_KroCI20 <- subset_data_by_time_and_date(CI20, "20240408", "20240414", "153000", "193000")
+apr_dusk_KroCI19 <- subset_data_by_time_and_date(CI19, "20240405", "20240414", "153000", "193000")
+apr_dusk_KroCI20 <- subset_data_by_time_and_date(CI20, "20240405", "20240414", "153000", "193000")
 
 # Dam Five
-apr_dusk_DamCC11 <- subset_data_by_time_and_date(CC11, "20240408", "20240414", "153000", "193000")
-apr_dusk_DamCI11 <- subset_data_by_time_and_date(CI11, "20240408", "20240414", "153000", "193000")
+apr_dusk_DamCC11 <- subset_data_by_time_and_date(CC11, "20240405", "20240414", "153000", "193000")
+apr_dusk_DamCI11 <- subset_data_by_time_and_date(CI11, "20240405", "20240414", "153000", "193000")
 
 # Tang Rang Bridge
-apr_dusk_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240408", "20240414", "153000", "193000")
-apr_dusk_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240408", "20240414", "153000", "193000")
+apr_dusk_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240405", "20240414", "153000", "193000")
+apr_dusk_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240405", "20240414", "153000", "193000")
 
 # Pursat
-apr_dusk_PurCC09 <- subset_data_by_time_and_date(CC09, "20240408", "20240414", "153000", "193000")
-apr_dusk_PurCI09 <- subset_data_by_time_and_date(CI09, "20240408", "20240414", "153000", "193000")
+apr_dusk_PurCC09 <- subset_data_by_time_and_date(CC09, "20240405", "20240414", "153000", "193000")
+apr_dusk_PurCI09 <- subset_data_by_time_and_date(CI09, "20240405", "20240414", "153000", "193000")
 
 # Combine Dataframe for April 2024 Dawn
 apr24_dusk_list <- list(apr_dusk_TachCI10, apr_dusk_TachCC01,
@@ -719,53 +766,53 @@ write.csv(apr24_dusk_data, "clean_data/datasets/apr24_dusk_data.csv", row.names 
 #### April 2024 Midnight Subset ------------------------------------------------------------------------------------------
 
 # Ta Chey
-apr_midn1_TachCI10 <- subset_data_by_time_and_date(CI10, "20240408", "20240414", "000000", "020000")
-apr_midn2_TachCI10 <- subset_data_by_time_and_date(CI10, "20240408", "20240414", "220000", "245900")
-apr_midn1_TachCC01 <- subset_data_by_time_and_date(CC01, "20240408", "20240414", "000000", "020000")
-apr_midn2_TachCC01 <- subset_data_by_time_and_date(CC01, "20240408", "20240414", "220000", "245900")
+apr_midn1_TachCI10 <- subset_data_by_time_and_date(CI10, "20240405", "20240414", "000000", "020000")
+apr_midn2_TachCI10 <- subset_data_by_time_and_date(CI10, "20240405", "20240414", "220000", "245900")
+apr_midn1_TachCC01 <- subset_data_by_time_and_date(CC01, "20240405", "20240414", "000000", "020000")
+apr_midn2_TachCC01 <- subset_data_by_time_and_date(CC01, "20240405", "20240414", "220000", "245900")
 
 # Arai
-apr_midn1_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240408", "20240414", "000000", "020000")
-apr_midn2_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240408", "20240414", "220000", "245900")
+apr_midn1_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240405", "20240414", "000000", "020000")
+apr_midn2_AraiCI02 <- subset_data_by_time_and_date(CI02, "20240405", "20240414", "220000", "245900")
 
 # Oda
-apr_midn1_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240408", "20240414", "000000", "020000")
-apr_midn2_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240408", "20240414", "220000", "245900")
-apr_midn1_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240408", "20240414", "000000", "020000")
-apr_midn2_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240408", "20240414", "220000", "245900")
+apr_midn1_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "000000", "020000")
+apr_midn2_OdaCI01 <- subset_data_by_time_and_date(CI01, "20240405", "20240414", "220000", "245900")
+apr_midn1_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "000000", "020000")
+apr_midn2_OdaCI13 <- subset_data_by_time_and_date(CI13, "20240405", "20240414", "220000", "245900")
 
 # Knaong Bat Sa
-apr_midn1_BatCI17 <- subset_data_by_time_and_date(CI17, "20240408", "20240414", "000000", "020000")
-apr_midn2_BatCI17 <- subset_data_by_time_and_date(CI17, "20240408", "20240414", "220000", "245900")
+apr_midn1_BatCI17 <- subset_data_by_time_and_date(CI17, "20240405", "20240414", "000000", "020000")
+apr_midn2_BatCI17 <- subset_data_by_time_and_date(CI17, "20240405", "20240414", "220000", "245900")
 
 # Ta Say
-apr_midn1_TasCI12 <- subset_data_by_time_and_date(CI12, "20240408", "20240414", "000000", "020000")
-apr_midn2_TasCI12 <- subset_data_by_time_and_date(CI12, "20240408", "20240414", "220000", "245900")
+apr_midn1_TasCI12 <- subset_data_by_time_and_date(CI12, "20240405", "20240414", "000000", "020000")
+apr_midn2_TasCI12 <- subset_data_by_time_and_date(CI12, "20240405", "20240414", "220000", "245900")
 
 # Kronomh
-apr_midn1_KroCI19 <- subset_data_by_time_and_date(CI19, "20240408", "20240414", "000000", "020000")
-apr_midn2_KroCI19 <- subset_data_by_time_and_date(CI19, "20240408", "20240414", "220000", "245900")
-apr_midn1_KroCI20 <- subset_data_by_time_and_date(CI20, "20240408", "20240414", "000000", "020000")
-apr_midn2_KroCI20 <- subset_data_by_time_and_date(CI20, "20240408", "20240414", "220000", "245900")
+apr_midn1_KroCI19 <- subset_data_by_time_and_date(CI19, "20240405", "20240414", "000000", "020000")
+apr_midn2_KroCI19 <- subset_data_by_time_and_date(CI19, "20240405", "20240414", "220000", "245900")
+apr_midn1_KroCI20 <- subset_data_by_time_and_date(CI20, "20240405", "20240414", "000000", "020000")
+apr_midn2_KroCI20 <- subset_data_by_time_and_date(CI20, "20240405", "20240414", "220000", "245900")
 
 
 # Dam Five
-apr_midn1_DamCC11 <- subset_data_by_time_and_date(CC11, "20240408", "20240414", "000000", "020000")
-apr_midn2_DamCC11 <- subset_data_by_time_and_date(CC11, "20240408", "20240414", "220000", "245900")
-apr_midn1_DamCI11 <- subset_data_by_time_and_date(CI11, "20240408", "20240414", "000000", "020000")
-apr_midn2_DamCI11 <- subset_data_by_time_and_date(CI11, "20240408", "20240414", "220000", "245900")
+apr_midn1_DamCC11 <- subset_data_by_time_and_date(CC11, "20240405", "20240414", "000000", "020000")
+apr_midn2_DamCC11 <- subset_data_by_time_and_date(CC11, "20240405", "20240414", "220000", "245900")
+apr_midn1_DamCI11 <- subset_data_by_time_and_date(CI11, "20240405", "20240414", "000000", "020000")
+apr_midn2_DamCI11 <- subset_data_by_time_and_date(CI11, "20240405", "20240414", "220000", "245900")
 
 # Tang Rang Bridge
-apr_midn1_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240408", "20240414", "000000", "020000")
-apr_midn2_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240408", "20240414", "000000", "020000")
-apr_midn1_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240408", "20240414", "000000", "020000")
-apr_midn2_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240408", "20240414", "000000", "020000")
+apr_midn1_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240405", "20240414", "000000", "020000")
+apr_midn2_TRangCC07 <- subset_data_by_time_and_date(CC07, "20240405", "20240414", "000000", "020000")
+apr_midn1_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240405", "20240414", "000000", "020000")
+apr_midn2_TRangCI07 <- subset_data_by_time_and_date(CI07, "20240405", "20240414", "000000", "020000")
 
 # Pursat
-apr_midn1_PurCC09 <- subset_data_by_time_and_date(CC09, "20240408", "20240414", "000000", "020000")
-apr_midn2_PurCC09 <- subset_data_by_time_and_date(CC09, "20240408", "20240414", "220000", "245900")
-apr_midn1_PurCI09 <- subset_data_by_time_and_date(CI09, "20240408", "20240414", "000000", "020000")
-apr_midn2_PurCI09 <- subset_data_by_time_and_date(CI09, "20240408", "20240414", "220000", "245900")
+apr_midn1_PurCC09 <- subset_data_by_time_and_date(CC09, "20240405", "20240414", "000000", "020000")
+apr_midn2_PurCC09 <- subset_data_by_time_and_date(CC09, "20240405", "20240414", "220000", "245900")
+apr_midn1_PurCI09 <- subset_data_by_time_and_date(CI09, "20240405", "20240414", "000000", "020000")
+apr_midn2_PurCI09 <- subset_data_by_time_and_date(CI09, "20240405", "20240414", "220000", "245900")
 
 # Combine Dataframe for Jan 2024 midn
 apr24_midn_list <- list(apr_midn1_TachCI10, apr_midn1_TachCC01,
