@@ -309,29 +309,29 @@ clean_acoustic_data(
   base_dir = base_directory,
   site = "TaCheyHill",     # Select specific sites (NULL for all)
   device = "CI07",    # Select specific devices (NULL for all)
-  start_date = "20250609",        # Start date in YYYYMMDD format (NULL for all)
-  end_date = "20250610")          # End date in YYYYMMDD format (NULL for all)
+  start_date = "20250608",        # Start date in YYYYMMDD format (NULL for all)
+  end_date = "20250611")          # End date in YYYYMMDD format (NULL for all)
 
 clean_acoustic_data(
   base_dir = base_directory,
   site = "TaCheyHill",    
   device = "CC05",  
-  start_date = "20250609",        
-  end_date = "20250610")          
+  start_date = "20250608",        
+  end_date = "20250611")          
 
 clean_acoustic_data(
   base_dir = base_directory,
   site = "TaCheyHill",    
   device = "CI12",  
-  start_date = "20250609",        
-  end_date = "20250610")    
+  start_date = "20250608",        
+  end_date = "20250611")    
 
 clean_acoustic_data(
   base_dir = base_directory,
   site = "TaCheyHill",    
   device = "SM3352",  
-  start_date = "20250609",        
-  end_date = "20250610")   ## CHECK
+  start_date = "20250608",        
+  end_date = "20250611")   ## CHECK
 
 # Ta Chey Lowlands = CI01, CI13, CC13 
 clean_acoustic_data(
