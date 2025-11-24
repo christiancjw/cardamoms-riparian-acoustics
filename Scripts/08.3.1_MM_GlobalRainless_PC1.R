@@ -91,7 +91,7 @@ vif(model1) # higher than 5 or 10 is bad
 # Residuals should look randomly scattered (no trend).
 # Variance should be even across predictions (homoscedasticity).
 # Outliers show up as extreme residuals.
-model2 <- lmer(PC1 ~ QBR + Strahler + (1|Site) + (1|Season), data = global_ds)
+model2 <- lmer(PC1 ~ QBR_Class + Strahler + (1|Site) + (1|Deployment_Season), data = global_ds)
 
 # Plot model diagnostics
 # 1. scaled residuals vs fitted
@@ -100,7 +100,7 @@ plot(model2, resid(., scaled=TRUE) ~ fitted(.), abline = 0)
 # 2. box plots by groups
 plot(model2, factor(Site) ~ resid(., scaled=TRUE))
 plot(model2, factor(Season) ~ resid(., scaled=TRUE))
-plot(model2, factor(QBR) ~ resid(., scaled=TRUE))
+plot(model2, factor(QBR_Class) ~ resid(., scaled=TRUE))
 
 # Outputs: fixed and random effects. broom.mixed= turns messy model output into neat tables.
 # 1. fixed effects
@@ -124,13 +124,13 @@ broom.mixed::tidy(model2, effects = "ran_coefs")
 # anova(model2, model2B) = compares log-likelihooglobal_ds. 
 # If the p-value is small (<0.05), the dropped variable (QBR) significantly improves model fit.
 model2B <- lmer(PC1 ~ Strahler + (1|Site) 
-                + (1|Season), data = global_ds)
+                + (1|Deployment_Season), data = global_ds)
 anova(model2, model2B) # yes
 
 # Is the fixed effect of Strahler significant?
 # Note this should use ML not REML
 model2C <- lmer(PC1 ~ QBR + (1|Site)
-                + (1|Season), data = global_ds)
+                + (1|Deployment_Season), data = global_ds)
 anova(model2, model2C) # NO
 
 # Is there an effect of Site?

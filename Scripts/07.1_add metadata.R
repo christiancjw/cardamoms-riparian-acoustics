@@ -62,19 +62,19 @@ bin_metadata <- function(df) {
 
 # Non-RL datasets
 global_singledevice      <- bin_metadata(global_singledevice)
-continuous_singledevice  <- bin_qbr_strahler(continuous_singledevice)
-multi25                  <- bin_qbr_strahler(multi25)
-multi25_1in5             <- bin_qbr_strahler(multi25_1in5)
-global_data              <- bin_qbr_strahler(global_data)
-sum25_songmeters         <- bin_qbr_strahler(sum25_songmeters)
+continuous_singledevice  <- bin_metadata(continuous_singledevice)
+multi25                  <- bin_metadata(multi25)
+multi25_1in5             <- bin_metadata(multi25_1in5)
+global_data              <- bin_metadata(global_data)
+sum25_songmeters         <- bin_metadata(sum25_songmeters)
 
 # RL datasets
-global_singledevice_RL     <- bin_qbr_strahler(global_singledevice_RL)
-continuous_singledevice_RL   <- bin_qbr_strahler(continuous_singledevice_RL)
-multi25_RL                  <- bin_qbr_strahler(multi25_RL)
-multi25_1in5_RL             <- bin_qbr_strahler(multi25_1in5_RL)
-global_data_RL              <- bin_qbr_strahler(global_data_RL)
-sum25_songmeters_RL         <- bin_qbr_strahler(sum25_songmeters_RL)
+global_singledevice_RL     <- bin_metadata(global_singledevice_RL)
+continuous_singledevice_RL   <- bin_metadata(continuous_singledevice_RL)
+multi25_RL                  <- bin_metadata(multi25_RL)
+multi25_1in5_RL             <- bin_metadata(multi25_1in5_RL)
+global_data_RL              <- bin_metadata(global_data_RL)
+sum25_songmeters_RL         <- bin_metadata(sum25_songmeters_RL)
 
 
 ### Save processed datasets back to CSV ----------------------

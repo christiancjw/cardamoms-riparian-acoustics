@@ -14,6 +14,7 @@ multi25_1in5            <- read.csv("clean_data/datasets/indices_datasets/multi2
 global_data             <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
 sum25_songmeters        <- read.csv("clean_data/datasets/indices_datasets/songmeters25_data.csv")
 
+
 global_singledevice_RL    <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
 continuous_singledevice_RL <- read.csv("clean_data/datasets/indices_datasets/continuousRL_data.csv")
 multi25_RL                <- read.csv("clean_data/datasets/indices_datasets/multi25RL_data.csv")
@@ -164,24 +165,24 @@ summary(rl_global_single_pca)
 rl_global_single_pca$rotation
 
 rl_continuous_single_pca  <- run_pca_subset(continuous_singledevice_RL, "00:00:00", "23:59:00")
-summary(continuous_singledevice_RL)
-continuous_singledevice_RL$rotation
+summary(rl_continuous_single_pca)
+rl_continuous_single_pca$rotation
 
 rl_multi25_pca            <- run_pca_subset(multi25_RL,                 "00:00:00", "23:59:00")
-summary(multi25_RL)
-multi25_RL$rotation
+summary(rl_multi25_pca)
+rl_multi25_pca$rotation
 
 rl_multi25_1in5_pca       <- run_pca_subset(multi25_1in5_RL,            "00:00:00", "23:59:00")
-summary(multi25_1in5_RL)
-multi25_1in5_RL$rotation
+summary(rl_multi25_1in5_pca)
+rl_multi25_1in5_pca$rotation
 
 rl_global_data_pca        <- run_pca_subset(global_data_RL,             "00:00:00", "23:59:00")
-summary(global_data_RL)
-global_data_RL$rotation
+summary(rl_global_data_pca)
+rl_global_data_pca$rotation
 
 rl_songmeter25_pca        <- run_pca_subset(sum25_songmeters_RL,        "00:00:00", "23:59:00")
-summary(sum25_songmeters_RL)
-sum25_songmeters_RL$rotation
+summary(rl_songmeter25_pca)
+rl_songmeter25_pca$rotation
 
 # ---- Bind Metadata ----
 rl_global_single_scores      <- bind_metadata(rl_global_single_pca,     global_singledevice_RL,     "00:00:00", "23:59:00")
