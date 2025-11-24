@@ -75,13 +75,14 @@ write.csv(global_data_clean, "clean_data/datasets/indices_datasets/songmeters25R
 
 
 # Check number of rows before and after filtering
-rows_before <- nrow(global_single_data)
-rows_after_rain <- nrow(global_single_rainless)
-rows_after_noise <- nrow(global_single_clean)
-rows_removed_rain <- rows_before - rows_after_rain
-rows_removed_noise<- rows_after_rain - rows_after_noise
-rows_removed <- rows_before - rows_after_noise
+rows_before <- nrow(global_singledevice)
+rows_after<- nrow(global_single_clean)
+rows_removed <- rows_before - rows_after
 
+rows_before <- nrow(global_data)
+rows_after<- nrow(global_data_clean)
+rows_removed <- rows_before - rows_after
+rows_removed
 # Check number of rows before and after filtering (june)
 rows_before <- nrow(jun24_single_data)
 rows_after_rain <- nrow(jun24_single_rainless)

@@ -6,10 +6,15 @@ library(tidyverse) # for data manipulation and plotting
 library(lme4) # for mixed models
 library(vegan)
 library(corrplot)
+library(reshape2)
+library(ggplot2)
 
 # Data Read-In
-globalsingle_ds <- read.csv("clean_data/datasets/PCAs/rainless_global_single_pca.csv")
-global_ds <- read.csv("clean_data/datasets/PCAs/rainless_global2325_pca.csv")
+singledevice_ds <- read.csv("clean_data/datasets/indices_datasets/global_singledevice_data.csv")
+global_ds <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
+
+rl_singledevice_ds <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
+rl_global_ds <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
 
 #### Function to run subset PCAs - allowing correct timing --------------------
 
@@ -116,17 +121,70 @@ bind_metadata <- function(pca_result, original_data, start_time = NULL, end_time
 }
 
 #### Run PCAs
-rl_global_single_pca <- run_pca_subset(global_singledevice_RL,     "00:00:00", "23:59:00")
-rl_global_single_scores <- bind_metadata(rl_global_single_pca,     global_singledevice_RL,     "00:00:00", "23:59:00")
-summary(rl_global_single_pca)
-rl_global_single_pca$rotation
 
-rl_global_data_pca <- run_pca_subset(global_data_RL, "00:00:00", "23:59:00")
-rl_global_data_scores <- bind_metadata(rl_global_data_pca, global_data_RL, "00:00:00", "23:59:00")
-summary(rl_global_data_pca)
-rl_global_data_pca$rotation
+single_pca <- run_pca_subset(singledevice_ds, "00:00:00", "23:59:00")
+single_scores <- bind_metadata(single_pca, singledevice_ds, "00:00:00", "23:59:00")
+summary(single_pca)
+single_pca$rotation
 
-# Compare PCA Loadings
+global_pca <- run_pca_subset(global_ds, "00:00:00", "23:59:00")
+global_scores <- bind_metadata(global_pca, global_ds, "00:00:00", "23:59:00")
+summary(global_pca)
+global_pca$rotation
+
+rl_single_pca <- run_pca_subset(rl_singledevice_ds,"00:00:00", "23:59:00")
+rl_single_scores <- bind_metadata(rl_single_pca, rl_singledevice_ds,"00:00:00", "23:59:00")
+summary(rl_single_pca)
+rl_single_pca$rotation
+
+rl_global_pca <- run_pca_subset(rl_global_ds, "00:00:00", "23:59:00")
+rl_global_scores <- bind_metadata(rl_global_pca, rl_global_ds, "00:00:00", "23:59:00")
+summary(rl_global_pca)
+rl_global_pca$rotation
+
+pca_models <- list(
+  raw_single      = single_pca,
+  raw_global      = global_pca,
+  rainless_single = rl_single_pca,
+  rainless_global = rl_global_pca
+)
+# Compare PCA Loadings across rainless and rain datasets ----------------------------
+
+compare_loadings <- function(pca1, pca2, name1, name2) {
+  # extract 3 PCs
+  L1 <- pca1$rotation[, 1:3]
+  L2 <- pca2$rotation[, 1:3]
+  
+  cat("\n==== Comparing:", name1, "vs", name2, "====\n")
+  print(protest(L1, L2, permutations = 999))
+  corrplot(cor(L1, L2), method = "circle", title = paste(name1, "vs", name2))
+}
+
+# 1) Rainless Single vs Raw Single
+compare_loadings(rl_global_single_pca, single_pca, "Rainless Single", "Raw Single")
+
+# 2) Rainless Global vs Raw Global
+compare_loadings(rl_global_data_pca, global_pca, "Rainless Global", "Raw Global")
+
+EVs <- data.frame(
+  PC = paste0("PC", 1:9),
+  rainless_single = rl_global_single_pca$sdev^2 / sum(rl_global_single_pca$sdev^2),
+  rainless_global = rl_global_data_pca$sdev^2 / sum(rl_global_data_pca$sdev^2),
+  raw_single      = single_pca$sdev^2 / sum(single_pca$sdev^2),
+  raw_global      = global_pca$sdev^2 / sum(global_pca$sdev^2)
+)
+
+EV_long <- melt(EVs, id.vars = "PC")
+
+ggplot(EV_long, aes(x = PC, y = value, color = variable, group = variable)) +
+  geom_line(size=1) + geom_point(size=3) +
+  labs(title = "Proportion of Variance Explained Across PCA Models",
+       y = "Variance Explained") +
+  theme_minimal()
+
+
+
+# Compare PCA Loadings across the rainless datasets -------------------
 load1 <- rl_global_single_pca$rotation[, 1:3]
 load2 <- rl_global_data_pca$rotation[, 1:3]
 
@@ -142,3 +200,25 @@ rl_global_data_pca$sdev^2 / sum(rl_global_data_pca$sdev^2)
 plot(load1[,1], load2[,1], xlab="Loadings PCA1 (Dataset A)",
      ylab="Loadings PCA1 (Dataset B)")
 abline(0,1,col="red")
+
+# Statistical test against Eigenvalues between Datasets
+EV1 <- rl_global_single_pca$sdev^2 / sum(rl_global_single_pca$sdev^2)
+EV2 <- rl_global_data_pca$sdev^2 / sum(rl_global_data_pca$sdev^2)
+
+t.test(EV1, EV2, paired = TRUE)
+
+# Plot
+
+EV <- data.frame(
+  PC = paste0("PC", 1:length(EV1)),
+  Single = EV1,
+  Global = EV2
+)
+
+EV_long <- reshape2::melt(EV, id.vars = "PC")
+
+ggplot(EV_long, aes(x = PC, y = value, group = variable, color = variable)) +
+  geom_line() + geom_point(size = 3) +
+  labs(y = "Proportion of Variance Explained",
+       color = "Dataset") +
+  theme_minimal()

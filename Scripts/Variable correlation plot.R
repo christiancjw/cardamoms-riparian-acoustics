@@ -7,11 +7,12 @@ library(ggrepel)
 library(GGally)
 
 #### Data Read in ------------------
- 
+singledevice_ds <- read.csv("clean_data/datasets/indices_datasets/global_singledevice_data.csv")
+global_ds <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
 
-single_global_rainless_data <- read.csv("clean_data/datasets/indices_datasets/single_global_rainless_data.csv")
+rl_singledevice_ds <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
+rl_global_ds <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
 
-head(single_global_rainless_data)
 #### Function to run Principal Component Analyses ---------------------------------------------------------------------------
 # Selects specific indices, standardises data and runs prcomp() 
 
@@ -34,6 +35,13 @@ run_pca <- function(data_subset) {
 
 
 #### Function to extract loadings --------------------
+
+
+
+
+
+
+
 # Scale loadings for visualization (adjust multiplier if needed)
 scale_factor <- 15 # Adjust this to change arrow length
 

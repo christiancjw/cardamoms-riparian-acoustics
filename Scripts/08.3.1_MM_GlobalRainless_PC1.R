@@ -51,7 +51,7 @@ global_ds <- global_ds %>%
 
 
 # Quick plot to identify the replication issue
-ggplot(global_ds, aes(x = QBR, y = Strahler, colour = as.factor(Branch))) +
+ggplot(global_ds, aes(x = QBR_Class, y = Strahler, colour = as.factor(Branch))) +
   geom_point() +
   facet_wrap(~Site)
 
@@ -69,7 +69,7 @@ global_ds <-
 
 
 # Model 1: Initial Linear Model without random effects ------------------------------------------------
-model1 <- lm(PC1 ~ QBR + Strahler, data = global_ds)
+model1 <- lm(PC1 ~ QBR_Class + Strahler, data = global_ds)
 # look at diagnostics
 autoplot(model1)
 # look at significance
@@ -91,7 +91,7 @@ vif(model1) # higher than 5 or 10 is bad
 # Residuals should look randomly scattered (no trend).
 # Variance should be even across predictions (homoscedasticity).
 # Outliers show up as extreme residuals.
-model2 <- lmer(PC1 ~ QBR_Class + Strahler + (1|Site) + (1|Deployment_Season), data = global_ds)
+model2 <- lmer(PC1 ~ QBR + Strahler + (1|Site) + (1|Deployment_Season) + (1|year), data = global_ds)
 
 # Plot model diagnostics
 # 1. scaled residuals vs fitted

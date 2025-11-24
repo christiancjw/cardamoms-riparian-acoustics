@@ -8,6 +8,7 @@ library(lubridate) # for date/time manipulations
 library(ggfortify) # for model diagnostic plots
 library(MuMIn) # for r2 values GLMM
 library(purrr) # For diel analysis
+library(hms)
 
 #--------------------------------------------
 # Global Rainless Single Data ---------------
@@ -260,3 +261,53 @@ ggplot(pc1_summary, aes(x = Hour, y = mean_PC1, color = QBR_group)) +
     panel.grid.major = element_line(color = "gray90"),
     panel.grid.minor = element_blank()
   )
+
+# NEW Time Bins
+global_ds <- global_ds %>%
+  # Convert numeric Time to 6-digit HHMMSS string
+  mutate(
+    TimeHHMMSS = str_pad(Time, width = 6, side = "left", pad = "0"),
+    Time_str = paste0(substr(TimeHHMMSS, 1, 2), ":", 
+                      substr(TimeHHMMSS, 3, 4), ":", 
+                      substr(TimeHHMMSS, 5, 6)),
+    # Convert to HMS (time only, no date!)
+    TimeHMS = hms::as_hms(Time_str)
+  )
+
+global_ds <- global_ds %>%
+  mutate(
+    Time30minBin = cut(
+      as.numeric(TimeHMS),                      # numeric seconds
+      breaks = seq(0, 24*3600, by = 1800),      # 30 min = 1800 sec
+      labels = FALSE,
+      include.lowest = TRUE
+    )
+  )
+
+
+time_labels <- format(
+  seq.POSIXt(
+    from = as.POSIXct("2000-01-01 00:00:00"),
+    by   = "30 min",
+    length.out = 48
+  ),
+  "%H:%M"
+)
+
+global_ds <- global_ds %>%
+  mutate(TimeBinLabel = time_labels[Time30minBin])
+
+table(global_ds$Time30minBin, useNA = "ifany")
+table(global_ds$TimeBinLabel, useNA = "ifany")
+
+global_ds_model <- global_ds %>%
+  filter(!is.na(Time30minBin))
+
+model_bin <- lmer(
+  PC1 ~ QBR + Strahler + TimeBinLabel + 
+    (1 | Site) + (1 | Deployment_Season),
+  data = global_ds_model
+)
+
+summary(model_bin)
+
