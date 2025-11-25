@@ -92,7 +92,7 @@ vif(model1) # higher than 5 or 10 is bad
 # Residuals should look randomly scattered (no trend).
 # Variance should be even across predictions (homoscedasticity).
 # Outliers show up as extreme residuals.
-model2 <- lmer(PC1 ~ QBR + Strahler + (1|Site) + (1|Season), data = global_ds)
+model2 <- lmer(PC1 ~ QBR_Class + Strahler + (1|Site) + (1|Season), data = global_ds)
 
 # Plot model diagnostics
 # 1. scaled residuals vs fitted
@@ -101,7 +101,7 @@ plot(model2, resid(., scaled=TRUE) ~ fitted(.), abline = 0)
 # 2. box plots by groups
 plot(model2, factor(Site) ~ resid(., scaled=TRUE))
 plot(model2, factor(Season) ~ resid(., scaled=TRUE))
-plot(model2, factor(QBR) ~ resid(., scaled=TRUE))
+plot(model2, factor(QBR_Class) ~ resid(., scaled=TRUE))
 
 # Outputs: fixed and random effects. broom.mixed= turns messy model output into neat tables.
 # 1. fixed effects
@@ -130,7 +130,7 @@ anova(model2, model2B) # yes
 
 # Is the fixed effect of Strahler significant?
 # Note this should use ML not REML
-model2C <- lmer(PC1 ~ QBR + (1|Site)
+model2C <- lmer(PC1 ~ QBR_Class + (1|Site)
                 + (1|Season), data = global_ds)
 anova(model2, model2C) # NO
 
@@ -139,22 +139,15 @@ anova(model2, model2C) # NO
 # This is mostly just to check that all the random effects
 # are really needed. If they are biologically important
 # leave them in even if not significant
-model2D <- lmer(PC1 ~ QBR + Strahler 
+model2D <- lmer(PC1 ~ QBR_Class + Strahler 
                 + (1|Season), data = global_ds)
 anova(model2, model2D, refit = FALSE) # Yes
 
 # Is there an effect of Season?
 # Note this should use REML not ML so use refit = FALSE
-model2F <- lmer(PC1 ~ QBR + Strahler + (1|Site), 
+model2F <- lmer(PC1 ~ QBR_Class + Strahler + (1|Site), 
                  data = global_ds)
 anova(model2, model2F, refit = FALSE) # Yes
-
-# Is there an effect of Year?
-# Note this should use REML not ML so use refit = FALSE
-model2F <- lmer(PC1 ~ QBR + Strahler + (1|Site) 
-                + (1|Season), data = global_ds)
-anova(model2, model2F, refit = FALSE) # Yes
-
 
 
 # Confidence intervals 
