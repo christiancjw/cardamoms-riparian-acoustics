@@ -7,20 +7,20 @@ library(tidyr)
 setwd("/Users/christianching/Documents/Projects/cardamoms-riparian-acoustics")
 
 #### Data Read in ------------------
-global_singledevice     <- read.csv("clean_data/datasets/indices_datasets/global_singledevice_data.csv")
+singledevice            <- read.csv("clean_data/datasets/indices_datasets/global_singledevice_data.csv")
 continuous_singledevice <- read.csv("clean_data/datasets/indices_datasets/continuous_data.csv")
 multi25                 <- read.csv("clean_data/datasets/indices_datasets/multi25_data.csv")
 multi25_1in5            <- read.csv("clean_data/datasets/indices_datasets/multi25_1in5_data.csv")
-global_data             <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
+global                  <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
 sum25_songmeters        <- read.csv("clean_data/datasets/indices_datasets/songmeters25_data.csv")
 
 
-global_singledevice_RL    <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
+singledevice_RL            <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
 continuous_singledevice_RL <- read.csv("clean_data/datasets/indices_datasets/continuousRL_data.csv")
-multi25_RL                <- read.csv("clean_data/datasets/indices_datasets/multi25RL_data.csv")
-multi25_1in5_RL           <- read.csv("clean_data/datasets/indices_datasets/multi25_1in5RL_data.csv")
-global_data_RL            <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
-sum25_songmeters_RL       <- read.csv("clean_data/datasets/indices_datasets/songmeters25RL_data.csv")
+multi25_RL                 <- read.csv("clean_data/datasets/indices_datasets/multi25RL_data.csv")
+multi25_1in5_RL            <- read.csv("clean_data/datasets/indices_datasets/multi25_1in5RL_data.csv")
+global_RL                  <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
+sum25_songmeters_RL        <- read.csv("clean_data/datasets/indices_datasets/songmeters25RL_data.csv")
 
 
 #### Function to run subset PCAs - allowing correct timing --------------------
@@ -132,27 +132,27 @@ bind_metadata <- function(pca_result, original_data, start_time = NULL, end_time
 ### ================================
 
 # ---- Run PCAs ----
-global_single_pca      <- run_pca_subset(global_singledevice,     "00:00:00", "23:59:00")
+single_pca             <- run_pca_subset(singledevice,            "00:00:00", "23:59:00")
 continuous_single_pca  <- run_pca_subset(continuous_singledevice, "00:00:00", "23:59:00")
 multi25_pca            <- run_pca_subset(multi25,                 "00:00:00", "23:59:00")
 multi25_1in5_pca       <- run_pca_subset(multi25_1in5,            "00:00:00", "23:59:00")
-global_data_pca        <- run_pca_subset(global_data,             "00:00:00", "23:59:00")
+global_pca             <- run_pca_subset(global,                  "00:00:00", "23:59:00")
 songmeter25_pca        <- run_pca_subset(sum25_songmeters,        "00:00:00", "23:59:00")
 
 # ---- Bind Metadata ----
-global_single_scores      <- bind_metadata(global_single_pca,     global_singledevice,     "00:00:00", "23:59:00")
+single_scores             <- bind_metadata(single_pca,            singledevice,            "00:00:00", "23:59:00")
 continuous_single_scores  <- bind_metadata(continuous_single_pca, continuous_singledevice, "00:00:00", "23:59:00")
 multi25_scores            <- bind_metadata(multi25_pca,           multi25,                 "00:00:00", "23:59:00")
 multi25_1in5_scores       <- bind_metadata(multi25_1in5_pca,      multi25_1in5,            "00:00:00", "23:59:00")
-global_data_scores        <- bind_metadata(global_data_pca,       global_data,             "00:00:00", "23:59:00")
+global_scores             <- bind_metadata(global_pca,            global,                  "00:00:00", "23:59:00")
 songmeter25_scores        <- bind_metadata(songmeter25_pca,       sum25_songmeters,        "00:00:00", "23:59:00")
 
 # ---- Save Files ----
-write.csv(global_single_scores,     "clean_data/datasets/PCAs/global_single_pca.csv",       row.names = FALSE)
+write.csv(single_scores,            "clean_data/datasets/PCAs/single_pca.csv",              row.names = FALSE)
 write.csv(continuous_single_scores, "clean_data/datasets/PCAs/continuous_single_pca.csv",   row.names = FALSE)
 write.csv(multi25_scores,           "clean_data/datasets/PCAs/multi25_pca.csv",             row.names = FALSE)
 write.csv(multi25_1in5_scores,      "clean_data/datasets/PCAs/multi25_1in5_pca.csv",        row.names = FALSE)
-write.csv(global_data_scores,       "clean_data/datasets/PCAs/global2325_pca.csv",          row.names = FALSE)
+write.csv(global_scores,            "clean_data/datasets/PCAs/global2325_pca.csv",          row.names = FALSE)
 write.csv(songmeter25_scores,       "clean_data/datasets/PCAs/songmeters25_pca.csv",        row.names = FALSE)
 
 ### ================================
@@ -160,9 +160,9 @@ write.csv(songmeter25_scores,       "clean_data/datasets/PCAs/songmeters25_pca.c
 ### ================================
 
 # ---- Run PCAs ----
-rl_global_single_pca      <- run_pca_subset(global_singledevice_RL,     "00:00:00", "23:59:00")
-summary(rl_global_single_pca)
-rl_global_single_pca$rotation
+rl_single_pca             <- run_pca_subset(singledevice_RL,     "00:00:00", "23:59:00")
+summary(rl_single_pca)
+rl_single_pca$rotation
 
 rl_continuous_single_pca  <- run_pca_subset(continuous_singledevice_RL, "00:00:00", "23:59:00")
 summary(rl_continuous_single_pca)
@@ -176,28 +176,28 @@ rl_multi25_1in5_pca       <- run_pca_subset(multi25_1in5_RL,            "00:00:0
 summary(rl_multi25_1in5_pca)
 rl_multi25_1in5_pca$rotation
 
-rl_global_data_pca        <- run_pca_subset(global_data_RL,             "00:00:00", "23:59:00")
-summary(rl_global_data_pca)
-rl_global_data_pca$rotation
+rl_global_pca             <- run_pca_subset(global_RL,             "00:00:00", "23:59:00")
+summary(rl_global_pca)
+rl_global_pca$rotation
 
 rl_songmeter25_pca        <- run_pca_subset(sum25_songmeters_RL,        "00:00:00", "23:59:00")
 summary(rl_songmeter25_pca)
 rl_songmeter25_pca$rotation
 
 # ---- Bind Metadata ----
-rl_global_single_scores      <- bind_metadata(rl_global_single_pca,     global_singledevice_RL,     "00:00:00", "23:59:00")
+rl_single_scores             <- bind_metadata(rl_single_pca,            singledevice_RL,            "00:00:00", "23:59:00")
 rl_continuous_single_scores  <- bind_metadata(rl_continuous_single_pca, continuous_singledevice_RL, "00:00:00", "23:59:00")
 rl_multi25_scores            <- bind_metadata(rl_multi25_pca,           multi25_RL,                 "00:00:00", "23:59:00")
 rl_multi25_1in5_scores       <- bind_metadata(rl_multi25_1in5_pca,      multi25_1in5_RL,            "00:00:00", "23:59:00")
-rl_global_data_scores        <- bind_metadata(rl_global_data_pca,       global_data_RL,             "00:00:00", "23:59:00")
+rl_global_scores             <- bind_metadata(rl_global_pca,            global_RL,                  "00:00:00", "23:59:00")
 rl_songmeter25_scores        <- bind_metadata(rl_songmeter25_pca,       sum25_songmeters_RL,        "00:00:00", "23:59:00")
 
 # ---- Save Files ----
-write.csv(rl_global_single_scores,     "clean_data/datasets/PCAs/rainless_global_single_pca.csv",       row.names = FALSE)
+write.csv(rl_single_scores,            "clean_data/datasets/PCAs/rainless_single_pca.csv",              row.names = FALSE)
 write.csv(rl_continuous_single_scores, "clean_data/datasets/PCAs/rainless_continuous_single_pca.csv",   row.names = FALSE)
 write.csv(rl_multi25_scores,           "clean_data/datasets/PCAs/rainless_multi25_pca.csv",             row.names = FALSE)
 write.csv(rl_multi25_1in5_scores,      "clean_data/datasets/PCAs/rainless_multi25_1in5_pca.csv",        row.names = FALSE)
-write.csv(rl_global_data_scores,       "clean_data/datasets/PCAs/rainless_global2325_pca.csv",          row.names = FALSE)
+write.csv(rl_global_scores,            "clean_data/datasets/PCAs/rainless_global2325_pca.csv",          row.names = FALSE)
 write.csv(rl_songmeter25_scores,       "clean_data/datasets/PCAs/rainless_songmeters25_pca.csv",        row.names = FALSE)
 
 

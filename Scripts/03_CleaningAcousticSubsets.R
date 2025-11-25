@@ -18,10 +18,10 @@ library(lubridate)
 # Define Mapping of Sites to Strahler Orders extracted using PCRaster in QGIS --------------
 strahler_map <- list("TaChey" = 1, 
                      "TaCheyHill" = 1,
-                     "Arai" = 3, 
+                     "Arai" = 2, 
                      "Oda" = 3,
                      "KnaongBatSa" = 1, 
-                     "TaSay" = 3, 
+                     "TaSay" = 2, 
                      "Kronomh" = 3, 
                      "DamFive" = 4, 
                      "TangRang" = 4, 

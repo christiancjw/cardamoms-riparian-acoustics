@@ -7,14 +7,14 @@ library(shinyjs)
 
 ## Setup --------------------------------------------------------------------------------------
 ### Data Read in ------------------
-global_singledevice         <- read.csv("clean_data/datasets/indices_datasets/global_singledevice_data.csv")
+singledevice                <- read.csv("clean_data/datasets/indices_datasets/global_singledevice_data.csv")
 continuous_singledevice     <- read.csv("clean_data/datasets/indices_datasets/continuous_data.csv")
 multi25                     <- read.csv("clean_data/datasets/indices_datasets/multi25_data.csv")
 multi25_1in5                <- read.csv("clean_data/datasets/indices_datasets/multi25_1in5_data.csv")
 global_data                 <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
 sum25_songmeters            <- read.csv("clean_data/datasets/indices_datasets/songmeters25_data.csv")
 
-global_singledevice_RL      <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
+singledevice_RL             <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
 continuous_singledevice_RL  <- read.csv("clean_data/datasets/indices_datasets/continuousRL_data.csv")
 multi25_RL                  <- read.csv("clean_data/datasets/indices_datasets/multi25RL_data.csv")
 multi25_1in5_RL             <- read.csv("clean_data/datasets/indices_datasets/multi25_1in5RL_data.csv")
@@ -23,14 +23,14 @@ sum25_songmeters_RL         <- read.csv("clean_data/datasets/indices_datasets/so
 
 ### Store datasets in a named list ------------------
 datasets <- list(
-  "Global Single Device"            = global_singledevice,
+  "Single Device"                   = singledevice,
   "Continuous"                      = continuous_singledevice,
   "Multi-device 2025"               = multi25,
   "Multi-Device 2025 (1 in 5)"      = multi25_1in5,
   "Global"                          = global_data,
   "Songmeters 2025"                 = sum25_songmeters,
   
-  "[RL] Global Single Device"       = global_singledevice_RL,
+  "[RL] Single Device"              = singledevice_RL,
   "[RL] Continuous"                 = continuous_singledevice_RL,
   "[RL] Multi-device 2025"          = multi25_RL,
   "[RL] Multi-Device 2025 (1 in 5)" = multi25_1in5_RL,
@@ -47,14 +47,14 @@ format_time_for_seeking <- function(time_value) {
 
 # Ensures that time column is numeric for all datasets
 # Apply mutate(Time = as.numeric(Time)) to each dataset
-global_singledevice        <- global_singledevice        %>% mutate(Time = as.numeric(Time))
+singledevice               <- singledevice               %>% mutate(Time = as.numeric(Time))
 continuous_singledevice    <- continuous_singledevice    %>% mutate(Time = as.numeric(Time))
 multi25                    <- multi25                    %>% mutate(Time = as.numeric(Time))
 multi25_1in5               <- multi25_1in5               %>% mutate(Time = as.numeric(Time))
 global_data                <- global_data                %>% mutate(Time = as.numeric(Time))
 sum25_songmeters           <- sum25_songmeters           %>% mutate(Time = as.numeric(Time))
 
-global_singledevice_RL     <- global_singledevice_RL     %>% mutate(Time = as.numeric(Time))
+singledevice_RL            <- singledevice_RL            %>% mutate(Time = as.numeric(Time))
 continuous_singledevice_RL <- continuous_singledevice_RL %>% mutate(Time = as.numeric(Time))
 multi25_RL                 <- multi25_RL                 %>% mutate(Time = as.numeric(Time))
 multi25_1in5_RL            <- multi25_1in5_RL            %>% mutate(Time = as.numeric(Time))
@@ -64,14 +64,14 @@ sum25_songmeters_RL        <- sum25_songmeters_RL        %>% mutate(Time = as.nu
 
 #### Define available dataframes   -----------------------------
 dataframes <- c(
-  "Global Single Device",
+  "Single Device",
   "Continuous",
   "Multi-device 2025",
   "Multi-Device 2025 (1 in 5)",
   "Global",
   "Songmeters 2025",
   
-  "[RL] Global Single Device",
+  "[RL] Single Device",
   "[RL] Continuous",
   "[RL] Multi-device 2025",
   "[RL] Multi-Device 2025 (1 in 5)",
@@ -180,20 +180,20 @@ period_anchors <- c(
   
   # QBR colours
   qbr_colors <- c(
-    "Natural (95–100)" = "blue",
-    "Good (75–90)"     = "green",
-    "Fair (55–70)"     = "gold",
-    "Poor (30–50)"     = "orange",
-    "Bad (<25)"        = "red"
+    "Natural (95–100)" = "#006BA6",
+    "Good (75–90)"     = "#22A122",
+    "Fair (55–70)"     = "#DBCB43",
+    "Poor (30–50)"     = "#FF7134",
+    "Bad (<25)"        = "#AF3245"
   )
   
   # Strahler colours
   strahler_colors <- c(
-    "1st Order" = "purple",
-    "2nd Order"   = "blue",
-    "3rd Order"  = "green",
-    "4th Order" = "gold",
-    "5th Order" = "orange"
+    "1st Order" = "#39A9DB",
+    "2nd Order"   = "#2EAB96",
+    "3rd Order"  = "#74A33F",
+    "4th Order" = "#E3E351",
+    "5th Order" = "#B6873A"
   )
 
 

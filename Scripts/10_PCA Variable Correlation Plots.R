@@ -282,7 +282,7 @@ heatmap_structured <- plot_ly(
   y = ~IndexShort,
   z = ~WeightedLoading,
   type = "heatmap",
-  colors = colorRamp(c("white", "#3DA9C7")),
+  colors = colorRamp(c("white", "black")),
   zmin = 0
 ) %>% layout(
   title = "Raw Structured",
@@ -309,7 +309,7 @@ heatmap_global <- plot_ly(
   y = ~IndexShort,
   z = ~WeightedLoading,
   type = "heatmap",
-  colors = colorRamp(c("white", "#3DA9C7")),
+  colors = colorRamp(c("white", "black")),
   zmin = 0
 ) %>% layout(
   title = "Raw Global",
@@ -336,7 +336,7 @@ heatmap_rl_structured <- plot_ly(
   y = ~IndexShort,
   z = ~WeightedLoading,
   type = "heatmap",
-  colors = colorRamp(c("white", "#3DA9C7")),
+  colors = colorRamp(c("white", "black")),
   zmin = 0
 ) %>% layout(
   title = "Filtered Structured",
@@ -363,7 +363,7 @@ heatmap_rl_global <- plot_ly(
   y = ~IndexShort,
   z = ~WeightedLoading,
   type = "heatmap",
-  colors = colorRamp(c("white", "#3DA9C7")),
+  colors = colorRamp(c("white", "black")),
   zmin = 0
 ) %>% layout(
   title = "Filtered Global",
@@ -379,7 +379,7 @@ heatmap_rl_global
 make_heatmap_plot <- function(df, title) {
   ggplot(df, aes(x = PC, y = IndexShort, fill = WeightedLoading)) +
     geom_tile() +
-    scale_fill_gradient(low = "white", high = "#3DA9C7") +
+    scale_fill_gradient(low = "white", high = "black") +
     theme_minimal() +
     labs(title = title, x = "Principal Components", y = "Indices") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))

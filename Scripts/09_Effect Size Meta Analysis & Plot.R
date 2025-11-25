@@ -120,7 +120,7 @@ bind_metadata <- function(pca_result, original_data, start_time = NULL, end_time
   return(pca_scores_with_metadata)
 }
 
-#### Run PCAs
+#### Run PCAs ---------------------------------
 
 single_pca <- run_pca_subset(singledevice_ds, "00:00:00", "23:59:00")
 single_scores <- bind_metadata(single_pca, singledevice_ds, "00:00:00", "23:59:00")
@@ -148,7 +148,7 @@ pca_models <- list(
   rainless_single = rl_single_pca,
   rainless_global = rl_global_pca
 )
-# Compare PCA Loadings across rainless and rain datasets ----------------------------
+# Compare PCA Loading Function----------------------------
 
 compare_loadings <- function(pca1, pca2, name1, name2) {
   # extract 3 PCs
@@ -160,65 +160,118 @@ compare_loadings <- function(pca1, pca2, name1, name2) {
   corrplot(cor(L1, L2), method = "circle", title = paste(name1, "vs", name2))
 }
 
+# Compare loadings across rainless and rain datasets -----------------------------
+
 # 1) Rainless Single vs Raw Single
-compare_loadings(rl_global_single_pca, single_pca, "Rainless Single", "Raw Single")
+compare_loadings(rl_single_pca, single_pca, "Rainless Single", "Raw Single")
 
 # 2) Rainless Global vs Raw Global
-compare_loadings(rl_global_data_pca, global_pca, "Rainless Global", "Raw Global")
+compare_loadings(rl_global_pca, global_pca, "Rainless Global", "Raw Global")
 
 EVs <- data.frame(
   PC = paste0("PC", 1:9),
-  rainless_single = rl_global_single_pca$sdev^2 / sum(rl_global_single_pca$sdev^2),
-  rainless_global = rl_global_data_pca$sdev^2 / sum(rl_global_data_pca$sdev^2),
+  rainless_single = rl_single_pca$sdev^2 / sum(rl_single_pca$sdev^2),
+  rainless_global = rl_global_pca$sdev^2 / sum(rl_global_pca$sdev^2),
   raw_single      = single_pca$sdev^2 / sum(single_pca$sdev^2),
   raw_global      = global_pca$sdev^2 / sum(global_pca$sdev^2)
 )
 
 EV_long <- melt(EVs, id.vars = "PC")
 
-ggplot(EV_long, aes(x = PC, y = value, color = variable, group = variable)) +
-  geom_line(size=1) + geom_point(size=3) +
-  labs(title = "Proportion of Variance Explained Across PCA Models",
-       y = "Variance Explained") +
+ggplot(EV_long, aes(x = PC, y = value, group = variable)) +
+  geom_line(aes(linetype = variable), alpha = 0.5, color = "black", size = 1) +
+  geom_point(aes(shape = variable), color = "black", size = 3) +
+  labs(
+    title = "Proportion of Variance Explained Across Datasets (PCA)",
+    y = "Variance Explained",
+    linetype = "Dataset",
+    shape = "Dataset"
+  ) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotdash", "dotted")) +
+  scale_shape_manual(values = c(16,  17, 15, 18)) +
   theme_minimal()
 
+p <- ggplot(EV_long, aes(x = PC, y = value, group = variable)) +
+  geom_line(aes(linetype = variable), alpha = 0.5, color = "black", size = 1) +
+  geom_point(aes(shape = variable), color = "black", size = 3) +
+  labs(
+    title = "Proportion of Variance Explained Across Datasets (PCA)",
+    y = "Variance Explained",
+    linetype = "Dataset",
+    shape = "Dataset"
+  ) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotdash", "dotted")) +
+  scale_shape_manual(values = c(16, 17, 15, 18)) +
+  theme_minimal() +
+  theme(
+    # make all rectangles transparent
+    plot.background      = element_rect(fill = "transparent", colour = NA),
+    panel.background     = element_rect(fill = "transparent", colour = NA),
+    legend.background    = element_rect(fill = "transparent", colour = NA),
+    legend.key           = element_rect(fill = "transparent", colour = NA),
+    panel.border         = element_rect(fill = "transparent", colour = NA),
+    strip.background     = element_rect(fill = "transparent", colour = NA),
+    
+    # keep text visible (black here); change if you want different text color
+    plot.title           = element_text(color = "black", face = "bold"),
+    axis.title           = element_text(color = "black"),
+    axis.text            = element_text(color = "black"),
+    legend.title         = element_text(color = "black"),
+    legend.text          = element_text(color = "black")
+  )
 
 
-# Compare PCA Loadings across the rainless datasets -------------------
-load1 <- rl_global_single_pca$rotation[, 1:3]
-load2 <- rl_global_data_pca$rotation[, 1:3]
+# Compare PCA Loadings across the  datasets -------------------
+loadA <- pcaA$rotation[, 1:nPC]
+loadB <- pcaB$rotation[, 1:nPC]
 
-protest(load1, load2, permutations = 999)
-
-# Plot
-corrplot(cor(load1, load2), method="circle")
-
-# Compare Variance
-rl_global_single_pca$sdev^2 / sum(rl_global_single_pca$sdev^2)
-rl_global_data_pca$sdev^2 / sum(rl_global_data_pca$sdev^2)
-
-plot(load1[,1], load2[,1], xlab="Loadings PCA1 (Dataset A)",
-     ylab="Loadings PCA1 (Dataset B)")
-abline(0,1,col="red")
-
-# Statistical test against Eigenvalues between Datasets
-EV1 <- rl_global_single_pca$sdev^2 / sum(rl_global_single_pca$sdev^2)
-EV2 <- rl_global_data_pca$sdev^2 / sum(rl_global_data_pca$sdev^2)
-
-t.test(EV1, EV2, paired = TRUE)
-
-# Plot
-
-EV <- data.frame(
-  PC = paste0("PC", 1:length(EV1)),
-  Single = EV1,
-  Global = EV2
+# Store PCAs in a named list
+pca_models <- list(
+  raw_single      = single_pca,
+  raw_global      = global_pca,
+  rainless_single = rl_single_pca,
+  rainless_global = rl_global_pca
 )
 
-EV_long <- reshape2::melt(EV, id.vars = "PC")
+### ---- FUNCTION: Compare PCA Loadings Between Two PCAs ----
 
-ggplot(EV_long, aes(x = PC, y = value, group = variable, color = variable)) +
-  geom_line() + geom_point(size = 3) +
-  labs(y = "Proportion of Variance Explained",
-       color = "Dataset") +
-  theme_minimal()
+compare_pca_loadings <- function(pcaA, pcaB, nameA, nameB, nPC = 3) {
+  
+  loadA <- as.matrix(pcaA$rotation[, 1:nPC]) %>% apply(2, as.numeric)
+  loadB <- as.matrix(pcaB$rotation[, 1:nPC]) %>% apply(2, as.numeric)
+  
+  # Test similarity using PROTEST (rotation invariance)
+  test <- protest(loadA, loadB, permutations = 999)
+  
+  # Visual correlation between loadings
+  corrplot(cor(loadA, loadB),
+           method = "circle",
+           title = paste("Loading Correlation:", nameA, "vs", nameB))
+  
+  # Scatter diag for PC1
+  plot(loadA[,1], loadB[,1],
+       xlab = paste("PC1 Loadings:", nameA),
+       ylab = paste("PC1 Loadings:", nameB),
+       main = paste("PC1 Loading Match:", nameA, "vs", nameB))
+  abline(0, 1, col = "red", lwd = 2)
+  
+  return(
+    tibble(
+      Comparison      = paste(nameA, "vs", nameB),
+      Protest_pvalue  = test$signif,
+      Protest_stat    = test$statistic
+    )
+  )
+}
+
+### ---- RUN COMPARISONS ACROSS DATASETS ----
+
+comparison_results <- bind_rows(
+  compare_pca_loadings(rl_single_pca, single_pca,  "Rainless Single", "Raw Single"),
+  compare_pca_loadings(rl_global_pca, global_pca,  "Rainless Global", "Raw Global"),
+  compare_pca_loadings(rl_single_pca, rl_global_pca, "Rainless Single", "Rainless Global"),
+  compare_pca_loadings(single_pca, global_pca, "Raw Single", "Raw Global")
+)
+
+### ---- VIEW THE RESULTS ----
+print(comparison_results)
