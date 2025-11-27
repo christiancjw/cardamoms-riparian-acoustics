@@ -8,7 +8,7 @@ structured_ds     <- read.csv("clean_data/datasets/PCAs/single_pca.csv")
 global_ds         <- read.csv("clean_data/datasets/PCAs/global2325_pca.csv")
 
 rl_structured_ds  <- read.csv("clean_data/datasets/PCAs/rainless_single_pca.csv")
-rl_global_ds     <- read.csv("clean_data/datasets/PCAs/rainless_global2325_pca.csv")
+rl_global_ds      <- read.csv("clean_data/datasets/PCAs/rainless_global2325_pca.csv")
 
 head(structured_ds)
 str(structured_ds)
