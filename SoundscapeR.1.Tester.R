@@ -842,26 +842,26 @@ observe({
 # Wavesurfer Integration -------------------------------
   shinyjs::runjs("
     $(document).ready(function() {
+  var wavesurfer = WaveSurfer.create({
+    container: '#waveform',
+    waveColor: 'violet',
+    progressColor: 'purple',
+    cursorColor: 'black',
+    height: 100,
+    sampleRate: 44100,
     
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
-        
-      var wavesurfer = WaveSurfer.create({
-        container: '#waveform',
-        waveColor: 'violet',
-        progressColor: 'purple',
-        cursorColor: 'black',
-        height: 100,
-        
-        plugins: [WaveSurfer.Spectrogram.create({
-          container: '#spectrogram', 
-          fftSamples: 1024, 
-          labels: true,
-          frequencyMax: audioCtx.sampleRate / 2
-          })]
-      });
-      
-      
-      var isPlaying = false;
+    plugins: [
+      WaveSurfer.Spectrogram.create({
+        container: '#spectrogram',
+        fftSamples: 512,
+        labels: true,
+        frequencyMax: 22050  // temporary; will fix on ready
+      })
+    ]
+  });
+
+  var spectrogramPlugin = wavesurfer.getActivePlugins()[0]; // get reference to spectrogram
+  var isPlaying = false;
       
       $('#play_pause').click(function() {
         isPlaying ? wavesurfer.pause() : wavesurfer.play(); 
