@@ -127,6 +127,25 @@ bind_metadata <- function(pca_result, original_data, start_time = NULL, end_time
   return(pca_scores_with_metadata)
 }
 
+### Set up functionality for PCA Alignment --------------------------------------
+
+## Function:
+align_pca_scores <- function(pca_obj, ref_loadings){
+  
+  current_loadings <- pca_obj$rotation[,1]
+  
+  # Check orientation
+  if(cor(current_loadings, ref_loadings) < 0){
+    pca_obj$x[,1] <- -pca_obj$x[,1]
+  }
+  
+  return(pca_obj)
+}
+
+# Select One PCA as a Master (Run first below)
+ref_loadings <- global_pca$rotation[,1]
+
+
 ### ================================
 ### RUN + SAVE RAW PCA RESULTS
 ### ================================
@@ -138,6 +157,14 @@ multi25_pca            <- run_pca_subset(multi25,                 "00:00:00", "2
 multi25_1in5_pca       <- run_pca_subset(multi25_1in5,            "00:00:00", "23:59:00")
 global_pca             <- run_pca_subset(global,                  "00:00:00", "23:59:00")
 songmeter25_pca        <- run_pca_subset(sum25_songmeters,        "00:00:00", "23:59:00")
+
+# ---- Align PCAs ---- # This step is nessesary for later Mixed Models
+single_pca             <- align_pca_scores(single_pca,                  ref_loadings)
+continuous_single_pca  <- align_pca_scores(continuous_single_pca,       ref_loadings)
+multi25_pca            <- align_pca_scores(multi25_pca,                 ref_loadings)
+multi25_1in5_pca       <- align_pca_scores(multi25_1in5_pca,            ref_loadings)
+global_pca             <- align_pca_scores(global_pca,                  ref_loadings)
+songmeter25_pca        <- align_pca_scores(songmeter25_pca,             ref_loadings)
 
 # ---- Bind Metadata ----
 single_scores             <- bind_metadata(single_pca,            singledevice,            "00:00:00", "23:59:00")
@@ -183,6 +210,14 @@ rl_global_pca$rotation
 rl_songmeter25_pca        <- run_pca_subset(sum25_songmeters_RL,        "00:00:00", "23:59:00")
 summary(rl_songmeter25_pca)
 rl_songmeter25_pca$rotation
+
+# ---- Align PCAs ---- # This step is nessesary for later Mixed Models
+rl_single_pca             <- align_pca_scores(rl_single_pca,                  ref_loadings)
+rl_continuous_single_pca  <- align_pca_scores(rl_continuous_single_pca,       ref_loadings)
+rl_multi25_pca            <- align_pca_scores(rl_multi25_pca,                 ref_loadings)
+rl_multi25_1in5_pca       <- align_pca_scores(rl_multi25_1in5_pca,            ref_loadings)
+rl_global_pca             <- align_pca_scores(rl_global_pca,                  ref_loadings)
+rl_songmeter25_pca        <- align_pca_scores(rl_songmeter25_pca,        ref_loadings)
 
 # ---- Bind Metadata ----
 rl_single_scores             <- bind_metadata(rl_single_pca,            singledevice_RL,            "00:00:00", "23:59:00")

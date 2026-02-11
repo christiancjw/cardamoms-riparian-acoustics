@@ -49,11 +49,36 @@ extract_loadings_df <- function(pca_res) {
 
 # ==================== 3) RUN PCA ON EACH DATASET ============================
 
-structured_pca    <- run_pca(structured_ds)
+structured_pca      <- run_pca(structured_ds)
 global_pca          <- run_pca(global_ds)
-rl_structured_pca <- run_pca(rl_structured_ds)
+rl_structured_pca   <- run_pca(rl_structured_ds)
 rl_global_pca       <- run_pca(rl_global_ds)
 
+# Choose reference
+ref_pca <- global_pca$pca
+
+# ==================== 3) Align PCA ON EACH DATASET ============================
+# Function - aligns both PC1 & PC2:
+align_pca_both <- function(pca_obj, ref_pca) {
+  for(i in 1:2) { # PC1 and PC2
+    cur <- setNames(as.numeric(pca_obj$rotation[,i]), rownames(pca_obj$rotation))
+    ref <- setNames(as.numeric(ref_pca$rotation[,i]), rownames(ref_pca$rotation))
+    common <- intersect(names(cur), names(ref))
+    cur <- cur[common]; ref <- ref[common]
+    if(cor(cur, ref) < 0) {
+      pca_obj$x[,i] <- -pca_obj$x[,i]
+      pca_obj$rotation[,i] <- -pca_obj$rotation[,i]
+    }
+  }
+  return(pca_obj)
+}
+
+# Run 
+structured_pca$pca      <- align_pca_both(structured_pca$pca, ref_pca)
+rl_structured_pca$pca   <- align_pca_both(rl_structured_pca$pca, ref_pca)
+rl_global_pca$pca       <- align_pca_both(rl_global_pca$pca, ref_pca)
+
+  
 
 ## ================== 4) PCA ARROW PLOTS (NO FUNCTIONS) =======================
 

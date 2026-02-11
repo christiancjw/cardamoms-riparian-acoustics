@@ -134,7 +134,7 @@ stability_scores <- boot_data %>%
     PC2_freq = mean(PC2_rank == 1),
     Stability_PC1 = PC1_strength * PC1_freq,
     Stability_PC2 = PC2_strength * PC2_freq
-  )
+  )§
 
 # Join tables into Summary
 full_stability_summary <- ci_table %>%
