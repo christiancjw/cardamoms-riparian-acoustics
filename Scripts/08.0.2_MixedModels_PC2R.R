@@ -14,7 +14,14 @@ library(purrr) # For diel analysis
 #--------------------------------------------
 # Read in and check data
 setwd("/Users/christianching/Documents/Projects/cardamoms-riparian-acoustics")
+
+# Select Dataset
+global_ds <- read.csv("clean_data/datasets/PCAs/single_pca.csv") 
 global_ds <- read.csv("clean_data/datasets/PCAs/rainless_global_single_pca.csv")
+
+global_ds <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
+global_ds <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
+
 
 head(global_ds)
 
@@ -221,7 +228,30 @@ model4_r2_vals
 
 coef(model4)  # gives raw fixed effects
 
+# Model 5 ----------
+model5 <- lmer(PC2 ~ QBR * TimeRangeFactor +
+                 Strahler * TimeRangeFactor +
+                 (1 | Site) + (1 | Season), 
+               data = global_ds)
 
+# Likelihood Ratio Tests - does this model integrating time improve model fit?
+anova(model4, model5)
+
+# Show Fixed EFfect Values for Model
+broom.mixed::tidy(model5, effects = "fixed")
+# Show Random Effect Values for model
+broom.mixed::tidy(model5, effects = "ran_pars")
+
+# Confidence Intervals
+confint(model5, method="Wald")
+confint(model5, method="profile")
+confint(model5, method="boot")
+
+# R2 Values
+model5_r2_vals <- r.squaredGLMM(model5)
+model5_r2_vals
+
+coef(model4)  # gives raw fixed effects
 
 ### Some random plotting stuff --------------
 ## Plotting - PC2 Over 24h cycle
@@ -237,12 +267,12 @@ global_ds <- global_ds %>%
   mutate(QBR_group = cut(QBR, breaks = c(0, 50, 75, 100), labels = c("Low", "Medium", "High")))
 
 # Summarize: mean PC2 per Hour per QBR_group
-PC2_summary <- global_ds %>%
+pc1_summary <- global_ds %>%
   group_by(Hour, QBR_group) %>%
   summarise(mean_PC2 = mean(PC2, na.rm = TRUE), .groups = "drop")
 
 # Plot
-ggplot(PC2_summary, aes(x = Hour, y = mean_PC2, color = QBR_group)) +
+ggplot(pc1_summary, aes(x = Hour, y = mean_PC2, color = QBR_group)) +
   geom_line(size = 1.2) +
   geom_smooth(aes(group = QBR_group), method = "loess", se = TRUE, linetype = "dashed") +
   scale_color_manual(values = c("Low" = "#ffffb2", "Medium" = "#fd8d3c", "High" = "#b10026")) +

@@ -8,14 +8,20 @@ library(lubridate) # for date/time manipulations
 library(ggfortify) # for model diagnostic plots
 library(MuMIn) # for r2 values GLMM
 library(purrr) # For diel analysis
-library(hms)
 
 #--------------------------------------------
 # Global Rainless Single Data ---------------
 #--------------------------------------------
 # Read in and check data
 setwd("/Users/christianching/Documents/Projects/cardamoms-riparian-acoustics")
+
+# Select Dataset
+global_ds <- read.csv("clean_data/datasets/PCAs/single_pca.csv") 
 global_ds <- read.csv("clean_data/datasets/PCAs/rainless_global_single_pca.csv")
+
+global_ds <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
+global_ds <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
+
 
 head(global_ds)
 
@@ -92,7 +98,7 @@ vif(model1) # higher than 5 or 10 is bad
 # Residuals should look randomly scattered (no trend).
 # Variance should be even across predictions (homoscedasticity).
 # Outliers show up as extreme residuals.
-model2 <- lmer(PC1 ~ QBR_Class + Strahler + (1|Site) + (1|Season), data = global_ds)
+model2 <- lmer(PC1 ~ QBR + Strahler + (1|Site) + (1|Season), data = global_ds)
 
 # Plot model diagnostics
 # 1. scaled residuals vs fitted
@@ -101,7 +107,7 @@ plot(model2, resid(., scaled=TRUE) ~ fitted(.), abline = 0)
 # 2. box plots by groups
 plot(model2, factor(Site) ~ resid(., scaled=TRUE))
 plot(model2, factor(Season) ~ resid(., scaled=TRUE))
-plot(model2, factor(QBR_Class) ~ resid(., scaled=TRUE))
+plot(model2, factor(QBR) ~ resid(., scaled=TRUE))
 
 # Outputs: fixed and random effects. broom.mixed= turns messy model output into neat tables.
 # 1. fixed effects
@@ -130,7 +136,7 @@ anova(model2, model2B) # yes
 
 # Is the fixed effect of Strahler significant?
 # Note this should use ML not REML
-model2C <- lmer(PC1 ~ QBR_Class + (1|Site)
+model2C <- lmer(PC1 ~ QBR + (1|Site)
                 + (1|Season), data = global_ds)
 anova(model2, model2C) # NO
 
@@ -139,15 +145,22 @@ anova(model2, model2C) # NO
 # This is mostly just to check that all the random effects
 # are really needed. If they are biologically important
 # leave them in even if not significant
-model2D <- lmer(PC1 ~ QBR_Class + Strahler 
+model2D <- lmer(PC1 ~ QBR + Strahler 
                 + (1|Season), data = global_ds)
 anova(model2, model2D, refit = FALSE) # Yes
 
 # Is there an effect of Season?
 # Note this should use REML not ML so use refit = FALSE
-model2F <- lmer(PC1 ~ QBR_Class + Strahler + (1|Site), 
+model2F <- lmer(PC1 ~ QBR + Strahler + (1|Site), 
                  data = global_ds)
 anova(model2, model2F, refit = FALSE) # Yes
+
+# Is there an effect of Year?
+# Note this should use REML not ML so use refit = FALSE
+model2F <- lmer(PC1 ~ QBR + Strahler + (1|Site) 
+                + (1|Season), data = global_ds)
+anova(model2, model2F, refit = FALSE) # Yes
+
 
 
 # Confidence intervals 
@@ -215,7 +228,30 @@ model4_r2_vals
 
 coef(model4)  # gives raw fixed effects
 
+# Model 5 ----------
+model5 <- lmer(PC1 ~ QBR * TimeRangeFactor +
+                 Strahler * TimeRangeFactor +
+                 (1 | Site) + (1 | Season), 
+               data = global_ds)
 
+# Likelihood Ratio Tests - does this model integrating time improve model fit?
+anova(model4, model5)
+
+# Show Fixed EFfect Values for Model
+broom.mixed::tidy(model5, effects = "fixed")
+# Show Random Effect Values for model
+broom.mixed::tidy(model5, effects = "ran_pars")
+
+# Confidence Intervals
+confint(model5, method="Wald")
+confint(model5, method="profile")
+confint(model5, method="boot")
+
+# R2 Values
+model5_r2_vals <- r.squaredGLMM(model5)
+model5_r2_vals
+
+coef(model4)  # gives raw fixed effects
 
 ### Some random plotting stuff --------------
 ## Plotting - PC1 Over 24h cycle
@@ -254,53 +290,3 @@ ggplot(pc1_summary, aes(x = Hour, y = mean_PC1, color = QBR_group)) +
     panel.grid.major = element_line(color = "gray90"),
     panel.grid.minor = element_blank()
   )
-
-# NEW Time Bins
-global_ds <- global_ds %>%
-  # Convert numeric Time to 6-digit HHMMSS string
-  mutate(
-    TimeHHMMSS = str_pad(Time, width = 6, side = "left", pad = "0"),
-    Time_str = paste0(substr(TimeHHMMSS, 1, 2), ":", 
-                      substr(TimeHHMMSS, 3, 4), ":", 
-                      substr(TimeHHMMSS, 5, 6)),
-    # Convert to HMS (time only, no date!)
-    TimeHMS = hms::as_hms(Time_str)
-  )
-
-global_ds <- global_ds %>%
-  mutate(
-    Time30minBin = cut(
-      as.numeric(TimeHMS),                      # numeric seconds
-      breaks = seq(0, 24*3600, by = 1800),      # 30 min = 1800 sec
-      labels = FALSE,
-      include.lowest = TRUE
-    )
-  )
-
-
-time_labels <- format(
-  seq.POSIXt(
-    from = as.POSIXct("2000-01-01 00:00:00"),
-    by   = "30 min",
-    length.out = 48
-  ),
-  "%H:%M"
-)
-
-global_ds <- global_ds %>%
-  mutate(TimeBinLabel = time_labels[Time30minBin])
-
-table(global_ds$Time30minBin, useNA = "ifany")
-table(global_ds$TimeBinLabel, useNA = "ifany")
-
-global_ds_model <- global_ds %>%
-  filter(!is.na(Time30minBin))
-
-model_bin <- lmer(
-  PC1 ~ QBR + Strahler + TimeBinLabel + 
-    (1 | Site) + (1 | Deployment_Season),
-  data = global_ds_model
-)
-
-summary(model_bin)
-
