@@ -481,7 +481,7 @@ mult_kronCI10 <- subset_data_by_time_and_date("Kronomh", "CI10", "20250702", "20
 sum25_tangrangCC02 <- subset_data_by_time_and_date("TangRang", "CC02", "20250606", "20250609", "000000", "235999")        
 
 # Ensure that subset from 2025 is given 1 in 5 minute subsetting
-summer25_global <- list(sum25_tachhillCI07, sum25_tachhillCC05, sum25_tachhillCI12, 
+summer25_global <- list(
                       sum25_tachCI01, sum25_tachCI13, sum25_tachCC13,
                       sum25_araiCI10, sum25_araiCI15, sum25_araiCC06,
                       sum25_odaCI09, sum25_odaCI19, sum25_odaCC07,
@@ -489,6 +489,8 @@ summer25_global <- list(sum25_tachhillCI07, sum25_tachhillCC05, sum25_tachhillCI
                       mult_tasayCI19, mult_tasayCI09, mult_tasayCI15,
                       mult_kronCI13, mult_kronCI10,
                       sum25_tangrangCC02)
+
+#sum25_tachhillCI07, sum25_tachhillCC05, sum25_tachhillCI12
                       
 summer25_global_1in5 <- lapply(summer25_global, subset_one_in_five)
 

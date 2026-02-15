@@ -134,7 +134,7 @@ stability_scores <- boot_data %>%
     PC2_freq = mean(PC2_rank == 1),
     Stability_PC1 = PC1_strength * PC1_freq,
     Stability_PC2 = PC2_strength * PC2_freq
-  )§
+  )
 
 # Join tables into Summary
 full_stability_summary <- ci_table %>%
@@ -168,3 +168,28 @@ procrustes_results <- map2(
 ) %>% 
   setNames(expand.grid(dataset_names, dataset_names, stringsAsFactors = FALSE) %>% 
              apply(1, paste, collapse="_vs_"))
+
+
+# Show Pc3 is breakpoint
+
+compare_dims <- function(pcaA, pcaB, max_pc = 6) {
+  
+  map_dfr(1:max_pc, function(k) {
+    
+    LA <- pcaA$rotation[, 1:k]
+    LB <- pcaB$rotation[, 1:k]
+    
+    pr <- protest(LA, LB, permutations = 9999)
+    
+    tibble(
+      PCs_used = paste0("PC1–", k),
+      Procrustes_correlation = pr$t0,
+      P_value = pr$signif
+    )
+  })
+}
+
+res <- compare_dims(single_pca, global_pca, max_pc = 6)
+print(res)
+
+

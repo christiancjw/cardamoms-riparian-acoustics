@@ -290,3 +290,4 @@ ggplot(pc1_summary, aes(x = Hour, y = mean_PC2, color = QBR_group)) +
     panel.grid.major = element_line(color = "gray90"),
     panel.grid.minor = element_blank()
   )
+w
