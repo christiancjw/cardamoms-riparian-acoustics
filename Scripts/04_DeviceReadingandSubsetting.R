@@ -502,6 +502,8 @@ write.csv(global_data_23to25, "clean_data/datasets/indices_datasets/global2325_d
 
 
 ### Songmeter Subset (2025) ----------------------------------------------------
+
+
 sum25_SM_tachill <- subset_data_by_time_and_date("TaCheyHill", "SM3352", "20250608", "20250611", "000000", "235999")
 sum25_SM_tach <- subset_data_by_time_and_date("TaChey", "SM3293", "20250608", "20250612", "000000", "235999")
 sum25_SM_arai <- subset_data_by_time_and_date("Arai", "SM2967", "20250608", "20250612", "000000", "235999")
@@ -518,3 +520,149 @@ head(sum25_songmeters_dataset)
 write.csv(sum25_songmeters_dataset, "clean_data/datasets/indices_datasets/songmeters25_data.csv", row.names = FALSE)
 
 
+## Cardamoms Subset --------
+
+
+# Ta Chey
+
+#This one is a full day recording - needs subsetting into 1in5
+nov_TachCI15 <- subset_data_by_time_and_date("TaChey", "CI15", "20231117", "20231220", "000000", "235999")
+# Use the subset function
+nov_TachCI15 <- subset_one_in_five(nov_TachCI15)
+jan_TachCC01 <- subset_data_by_time_and_date("TaChey", "CC01", "20240111", "20240120", "000000", "235999")
+apr_TachCC01 <- subset_data_by_time_and_date("TaChey", "CC01", "20240405", "20240414", "000000", "235999")
+jun_TachCC01 <- subset_data_by_time_and_date("TaChey", "CC01", "20240610", "20240619", "000000", "235999")
+
+# Arai
+nov_AraiCI02 <- subset_data_by_time_and_date("Arai","CI02", "20231123", "20231202", "000000", "235999")
+jan_AraiCI02 <- subset_data_by_time_and_date("Arai","CI02", "20240112", "20240121", "000000", "235999")
+apr_AraiCI02 <- subset_data_by_time_and_date("Arai","CI02", "20240405", "20240414", "000000", "235999")
+jun_AraiCI02 <- subset_data_by_time_and_date("Arai","CI02", "20240612", "20240621", "000000", "235999")
+
+# Oda
+nov_OdaCI13 <- subset_data_by_time_and_date("Oda", "CI13", "20231123", "20231202", "000000", "235999")
+jan_OdaCI13 <- subset_data_by_time_and_date("Oda", "CI13", "20240112", "20240121", "000000", "235999")
+apr_OdaCI13 <- subset_data_by_time_and_date("Oda", "CI13", "20240405", "20240414", "000000", "235999")
+jun_OdaCI01 <- subset_data_by_time_and_date("Oda", "CI01", "20240610", "20240619", "000000", "235999")
+
+# Knaong Bat Sa
+jan_BatCI05 <- subset_data_by_time_and_date("KnaongBatSa", "CI05", "20240117", "20240126", "000000", "235999")
+apr_BatCI17 <- subset_data_by_time_and_date("KnaongBatSa", "CI17", "20240408", "20240417", "000000", "235999")
+jun_BatCI17 <- subset_data_by_time_and_date("KnaongBatSa", "CI17", "20240616", "20240625", "000000", "235999")
+
+# Ta Say
+jan_TasCC12 <- subset_data_by_time_and_date("TaSay", "CC12", "20240119", "20240128", "000000", "235999")
+apr_TasCI12 <- subset_data_by_time_and_date("TaSay", "CI12", "20240407", "20240416", "000000", "235999")
+jun_TasCI12 <- subset_data_by_time_and_date("TaSay", "CI12", "20240616", "20240625", "000000", "235999")
+
+# Kronomh
+apr_KroCI19 <- subset_data_by_time_and_date("Kronomh", "CI19", "20240406", "20240415", "000000", "235999")
+jun_KroCI19 <- subset_data_by_time_and_date("Kronomh", "CI19", "20240614", "20240623", "000000", "235999")
+
+# Dam Five
+jan_DamCC11 <- subset_data_by_time_and_date("DamFive", "CC11", "20240113", "20240122", "000000", "235999")
+apr_DamCC11 <- subset_data_by_time_and_date("DamFive", "CC11", "20240407", "20240416", "000000", "235999")
+jun_DamCC11 <- subset_data_by_time_and_date("DamFive", "CC11", "20240614", "20240623", "000000", "235999")
+
+# Tang Rang Bridge
+nov_TRangCI07 <- subset_data_by_time_and_date("TangRang" ,"CI07", "20231123", "20231202", "000000", "235999")
+jan_TRangCI07 <- subset_data_by_time_and_date("TangRang" ,"CI07", "20240111", "20240120", "000000", "235999")
+apr_TRangCI07 <- subset_data_by_time_and_date("TangRang" ,"CI07", "20240405", "20240414", "000000", "235999")
+jun_TRangCI07 <- subset_data_by_time_and_date("TangRang" ,"CI07", "20240614", "20240623", "000000", "235999")
+
+# Pursat
+nov_PurCI09 <- subset_data_by_time_and_date("PursatTown", "CI09", "20231123", "20231202", "000000", "235999")
+jan_PurCI09 <- subset_data_by_time_and_date("PursatTown", "CI09", "20240120", "20240129", "000000", "235999")
+apr_PurCI09 <- subset_data_by_time_and_date("PursatTown", "CI09", "20240404", "20240413", "000000", "235999")
+jun_PurCI09 <- subset_data_by_time_and_date("PursatTown", "CI09", "20240614", "20240623", "000000", "235999")
+
+# Ta Chey
+
+#This one is a full day recording - needs subsetting into 1in5
+nov_TachCI15 <- subset_data_by_time_and_date("TaChey", "CI15", "20231117", "20231220", "000000", "235999")
+# Use the subset function
+nov_TachCI15 <- subset_one_in_five(nov_TachCI15)
+jan_TachCC01 <- subset_data_by_time_and_date("TaChey", "CC01", "20240111", "20240120", "000000", "235999")
+apr_TachCC01 <- subset_data_by_time_and_date("TaChey", "CC01", "20240405", "20240414", "000000", "235999")
+jun_TachCC01 <- subset_data_by_time_and_date("TaChey", "CC01", "20240610", "20240619", "000000", "235999")
+
+# Arai
+nov_AraiCI02 <- subset_data_by_time_and_date("Arai","CI02", "20231123", "20231202", "000000", "235999")
+jan_AraiCI02 <- subset_data_by_time_and_date("Arai","CI02", "20240112", "20240121", "000000", "235999")
+apr_AraiCI02 <- subset_data_by_time_and_date("Arai","CI02", "20240405", "20240414", "000000", "235999")
+jun_AraiCI02 <- subset_data_by_time_and_date("Arai","CI02", "20240612", "20240621", "000000", "235999")
+
+# Oda
+nov_OdaCI13 <- subset_data_by_time_and_date("Oda", "CI13", "20231123", "20231202", "000000", "235999")
+jan_OdaCI13 <- subset_data_by_time_and_date("Oda", "CI13", "20240112", "20240121", "000000", "235999")
+apr_OdaCI13 <- subset_data_by_time_and_date("Oda", "CI13", "20240405", "20240414", "000000", "235999")
+jun_OdaCI01 <- subset_data_by_time_and_date("Oda", "CI01", "20240610", "20240619", "000000", "235999")
+
+# Knaong Bat Sa
+jan_BatCI05 <- subset_data_by_time_and_date("KnaongBatSa", "CI05", "20240117", "20240126", "000000", "235999")
+apr_BatCI17 <- subset_data_by_time_and_date("KnaongBatSa", "CI17", "20240408", "20240417", "000000", "235999")
+jun_BatCI17 <- subset_data_by_time_and_date("KnaongBatSa", "CI17", "20240616", "20240625", "000000", "235999")
+
+# Ta Say
+jan_TasCC12 <- subset_data_by_time_and_date("TaSay", "CC12", "20240119", "20240128", "000000", "235999")
+apr_TasCI12 <- subset_data_by_time_and_date("TaSay", "CI12", "20240407", "20240416", "000000", "235999")
+jun_TasCI12 <- subset_data_by_time_and_date("TaSay", "CI12", "20240616", "20240625", "000000", "235999")
+
+# Kronomh
+apr_KroCI19 <- subset_data_by_time_and_date("Kronomh", "CI19", "20240406", "20240415", "000000", "235999")
+jun_KroCI19 <- subset_data_by_time_and_date("Kronomh", "CI19", "20240614", "20240623", "000000", "235999")
+
+# Dam Five
+jan_DamCC11 <- subset_data_by_time_and_date("DamFive", "CC11", "20240113", "20240122", "000000", "235999")
+apr_DamCC11 <- subset_data_by_time_and_date("DamFive", "CC11", "20240407", "20240416", "000000", "235999")
+jun_DamCC11 <- subset_data_by_time_and_date("DamFive", "CC11", "20240614", "20240623", "000000", "235999")
+
+# Tang Rang Bridge
+nov_TRangCI07 <- subset_data_by_time_and_date("TangRang" ,"CI07", "20231123", "20231202", "000000", "235999")
+jan_TRangCI07 <- subset_data_by_time_and_date("TangRang" ,"CI07", "20240111", "20240120", "000000", "235999")
+apr_TRangCI07 <- subset_data_by_time_and_date("TangRang" ,"CI07", "20240405", "20240414", "000000", "235999")
+jun_TRangCI07 <- subset_data_by_time_and_date("TangRang" ,"CI07", "20240614", "20240623", "000000", "235999")
+
+# Pursat
+nov_PurCI09 <- subset_data_by_time_and_date("PursatTown", "CI09", "20231123", "20231202", "000000", "235999")
+jan_PurCI09 <- subset_data_by_time_and_date("PursatTown", "CI09", "20240120", "20240129", "000000", "235999")
+apr_PurCI09 <- subset_data_by_time_and_date("PursatTown", "CI09", "20240404", "20240413", "000000", "235999")
+jun_PurCI09 <- subset_data_by_time_and_date("PursatTown", "CI09", "20240614", "20240623", "000000", "235999")
+
+
+global_singleD_list <- list(nov_TachCI15, jan_TachCC01, apr_TachCC01, jun_TachCC01, 
+                            nov_AraiCI02, jan_AraiCI02, apr_AraiCI02, jun_AraiCI02, 
+                            nov_OdaCI13, jan_OdaCI13, apr_OdaCI13, jun_OdaCI01,
+                            jan_BatCI05, apr_BatCI17, jun_BatCI17,
+                            jan_TasCC12, apr_TasCI12, jun_TasCI12,
+                            apr_KroCI19, jun_KroCI19,
+                            jan_DamCC11, apr_DamCC11, jun_DamCC11,
+                            nov_TRangCI07, jan_TRangCI07, apr_TRangCI07, jun_TRangCI07)
+
+### Adding 2025
+sum25_tachCI01 <- subset_data_by_time_and_date("TaChey", "CI01", "20250608", "20250612", "000000", "235999")
+sum25_araiCI10 <- subset_data_by_time_and_date("Arai", "CI10", "20250608", "20250612", "000000", "235999")          
+sum25_odaCI09 <- subset_data_by_time_and_date("Oda", "CI09", "20250607", "20250611", "000000", "235999")
+
+#fix oda's QBR in 2025
+sum25_odaCI09 <- sum25_odaCI09 %>%
+  mutate(QBR_Score = 40)
+
+sum25_batsaCI07 <- subset_data_by_time_and_date("KnaongBatSa", "CI01", "20250704", "20250708", "000000", "235999")
+sum25_tasayCI19 <- subset_data_by_time_and_date("TaSay", "CI19", "20250705", "20250709", "000000", "235999")
+sum25_kronCI13 <- subset_data_by_time_and_date("Kronomh", "CI13", "20250702", "20250706", "000000", "235999")
+
+sum25_tangrangCC02 <- subset_data_by_time_and_date("TangRang", "CC02", "20250606", "20250609", "000000", "235999")          
+
+# Ensure that subset from 2025 is given 1 in 5 minute subsetting
+summer25_singledeivces <- list(sum25_tachCI01, sum25_araiCI10, sum25_odaCI09, sum25_batsaCI07, sum25_tasayCI19, sum25_kronCI13, sum25_tangrangCC02)
+summer25_singledeivces_1in5 <- lapply(summer25_singledeivces, subset_one_in_five)
+
+# Add the 2025 1 in 5 data to the 2023-2024 global
+global2023_2025_singleD_list <- list(global_singleD_list, summer25_singledeivces_1in5)
+
+global2023_2025_singleDataset <- bind_rows(global2023_2025_singleD_list)
+
+head(global2023_2025_singleDataset)
+
+write.csv(global2023_2025_singleDataset, "clean_data/datasets/indices_datasets/cardamoms_singledevice_data.csv", row.names = FALSE)

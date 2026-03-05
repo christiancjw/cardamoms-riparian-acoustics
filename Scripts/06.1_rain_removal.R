@@ -11,6 +11,8 @@ multi25_1in5            <- read.csv("clean_data/datasets/indices_datasets/multi2
 global_data             <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
 songmeters25_data       <- read.csv("clean_data/datasets/indices_datasets/songmeters25_data.csv")
  
+cardamoms_data       <- read.csv("clean_data/datasets/indices_datasets/cardamoms_singledevice_data.csv")
+
 
 # Read in Rain and Noise Datasets 
 fullraindata              <- read.csv("clean_data/datasets/interference/rain.csv")
@@ -73,6 +75,14 @@ songmeters25_data_clean <- songmeters25_data %>%
 
 write.csv(global_data_clean, "clean_data/datasets/indices_datasets/songmeters25RL_data.csv", row.names = FALSE)
 
+# Cardamoms 
+# Global SingleDevice Dataset
+cardamoms_data_clean <- cardamoms_data %>%
+  anti_join(fullinterference_trimmed, by = c("Site", "Device", "Date", "FileName")) 
+
+write.csv(cardamoms_data_clean, "clean_data/datasets/indices_datasets/cardamomsRL_singledevice_data.csv", row.names = FALSE)
+
+
 
 # Check number of rows before and after filtering
 rows_before <- nrow(global_singledevice)
@@ -98,4 +108,6 @@ cat("Rows after filtering:", rows_after_noise, "\n")
 cat("Rows removed due to rain:", rows_removed_rain, "\n")
 cat("Rows removed due to noise:", rows_removed_noise, "\n")
 cat("Rows removed (total):", rows_removed, "\n")
+
+
 

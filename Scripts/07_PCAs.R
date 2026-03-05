@@ -22,6 +22,8 @@ multi25_1in5_RL            <- read.csv("clean_data/datasets/indices_datasets/mul
 global_RL                  <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
 sum25_songmeters_RL        <- read.csv("clean_data/datasets/indices_datasets/songmeters25RL_data.csv")
 
+cardamoms_RL       <- read.csv("clean_data/datasets/indices_datasets/cardamoms_RL_data.csv")
+
 
 #### Function to run subset PCAs - allowing correct timing --------------------
 
@@ -234,5 +236,23 @@ write.csv(rl_multi25_scores,           "clean_data/datasets/PCAs/rainless_multi2
 write.csv(rl_multi25_1in5_scores,      "clean_data/datasets/PCAs/rainless_multi25_1in5_pca.csv",        row.names = FALSE)
 write.csv(rl_global_scores,            "clean_data/datasets/PCAs/rainless_global2325_pca.csv",          row.names = FALSE)
 write.csv(rl_songmeter25_scores,       "clean_data/datasets/PCAs/rainless_songmeters25_pca.csv",        row.names = FALSE)
+
+
+# Run Cardamoms 
+cardamoms_RL_pca             <- run_pca_subset(cardamoms_RL, 
+                                               "00:00:00", "23:59:00")
+
+
+cardamoms_RL_pca             <- align_pca_scores(cardamoms_RL_pca, ref_loadings)
+
+
+cardamoms_RL_pca_scores <- bind_metadata(cardamoms_RL_pca,
+                                         cardamoms_RL, 
+                                         "00:00:00", "23:59:00")
+
+write.csv(cardamoms_RL_pca_scores,
+          "clean_data/datasets/PCAs/cardamoms_rl_pca",
+          row.names = FALSE)
+
 
 
