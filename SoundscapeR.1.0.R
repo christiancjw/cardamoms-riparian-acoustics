@@ -14,12 +14,15 @@ multi25_1in5                <- read.csv("clean_data/datasets/indices_datasets/mu
 global_data                 <- read.csv("clean_data/datasets/indices_datasets/global2325_data.csv")
 sum25_songmeters            <- read.csv("clean_data/datasets/indices_datasets/songmeters25_data.csv")
 
+singledevice2024            <- read.csv("clean_data/datasets/indices_datasets/2023_2024_singledevice_data.csv")
+
 singledevice_RL             <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
 continuous_singledevice_RL  <- read.csv("clean_data/datasets/indices_datasets/continuousRL_data.csv")
 multi25_RL                  <- read.csv("clean_data/datasets/indices_datasets/multi25RL_data.csv")
 multi25_1in5_RL             <- read.csv("clean_data/datasets/indices_datasets/multi25_1in5RL_data.csv")
 global_data_RL              <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
 sum25_songmeters_RL         <- read.csv("clean_data/datasets/indices_datasets/songmeters25RL_data.csv")
+
 
 ### Store datasets in a named list ------------------
 datasets <- list(
@@ -29,6 +32,8 @@ datasets <- list(
   "Multi-Device 2025 (1 in 5)"      = multi25_1in5,
   "Global"                          = global_data,
   "Songmeters 2025"                 = sum25_songmeters,
+  
+  "singledevice2024"                = singledevice2024,
   
   "[RL] Single Device"              = singledevice_RL,
   "[RL] Continuous"                 = continuous_singledevice_RL,
@@ -54,12 +59,15 @@ multi25_1in5               <- multi25_1in5               %>% mutate(Time = as.nu
 global_data                <- global_data                %>% mutate(Time = as.numeric(Time))
 sum25_songmeters           <- sum25_songmeters           %>% mutate(Time = as.numeric(Time))
 
+singledevice2024           <- singledevice2024           %>% mutate(Time = as.numeric(Time))
+
 singledevice_RL            <- singledevice_RL            %>% mutate(Time = as.numeric(Time))
 continuous_singledevice_RL <- continuous_singledevice_RL %>% mutate(Time = as.numeric(Time))
 multi25_RL                 <- multi25_RL                 %>% mutate(Time = as.numeric(Time))
 multi25_1in5_RL            <- multi25_1in5_RL            %>% mutate(Time = as.numeric(Time))
 global_data_RL             <- global_data_RL             %>% mutate(Time = as.numeric(Time))
 sum25_songmeters_RL        <- sum25_songmeters_RL        %>% mutate(Time = as.numeric(Time))
+
 
 
 #### Define available dataframes   -----------------------------
@@ -70,6 +78,8 @@ dataframes <- c(
   "Multi-Device 2025 (1 in 5)",
   "Global",
   "Songmeters 2025",
+  
+  "singledevice2024",
   
   "[RL] Single Device",
   "[RL] Continuous",
@@ -629,26 +639,37 @@ server <- function(input, output, session) {
             mutate(Time_fmt = sprintf("%06d", as.numeric(Time)))
         }
         
-        # Convert to POSIX and format as HH:MM
+        # Convert to POSIX
         scores <- scores %>%
           mutate(
             Time_posix = as.POSIXct(Time_fmt, format = "%H%M%S", tz = "UTC"),
-            Time_hm = format(Time_posix, "%H:%M")
+            Minutes = hour(Time_posix) * 60 + minute(Time_posix),       # minutes past midnight
+            Time_bin = floor(Minutes / 30) * 30,                         # 30-minute bins
+            Time_label = sprintf("%02d:%02d", Time_bin %/% 60, Time_bin %% 60)  # HH:MM
           )
         
         # Average per site / bin
         avg_scores <- scores %>%
-          group_by(Time_hm, !!sym(colvar)) %>%
+          group_by(Time_bin, Time_label, !!sym(colvar)) %>%
           summarise(
             mean_y = mean(.data[[pcy]], na.rm = TRUE),
             mean_z = mean(.data[[pcz]], na.rm = TRUE),
             .groups = "drop"
-          )
+          ) %>%
+          arrange(Time_bin)  # ensures x-axis is in chronological order
         
         # 3D Plot
-        p <- plot_ly(avg_scores, x = ~Time_hm, y = ~mean_y, z = ~mean_z,
-                     type = "scatter3d", mode = "lines+markers", marker = list(size = 2),
-                     color = avg_scores[[colvar]], colors = pal) %>%
+        p <- plot_ly(
+          avg_scores,
+          x = ~Time_label,
+          y = ~mean_y,
+          z = ~mean_z,
+          type = "scatter3d",
+          mode = "lines+markers",
+          marker = list(size = 2),
+          color = avg_scores[[colvar]],
+          colors = pal
+        ) %>%
           layout(scene = list(
             xaxis = list(title = "Time of Day"),
             yaxis = list(title = ylab),
