@@ -12,6 +12,15 @@ global_ds <- read.csv("clean_data/datasets/PCAs/global2325_pca.csv")
 # Clean Data Tables - adding values to use for filtering 
 global_ds <- global_ds %>%
   mutate(
+    Deployment = case_when(
+      Date >= 20231116 & Date <= 20231203 ~ "Monsoon 2023",
+      Date >= 20231230 & Date <= 20240208 ~ "Dry Transition 2024",
+      Date >= 20240401 & Date <= 20240501 ~ "Dry 2024",
+      Date >= 20240607 & Date <= 20240707 ~ "Monsoon Transition 2024",
+      Date >= 20250605 & Date <= 20250716 ~ "Monsoon 2025",
+      TRUE ~ NA_character_
+    )) %>%
+  mutate(
     Season = case_when(
       Date >= 20231116 & Date <= 20231203 ~ "Monsoon",
       Date >= 20231230 & Date <= 20240208 ~ "Dry",
@@ -42,42 +51,83 @@ global_ds <- global_ds %>%
     Site = factor(Site),
     Season = factor(Season),
     Device = factor(Device)
+  ) %>%  # Create QBR_Bin
+  mutate(QBR_bin = case_when(
+    QBR >= 95 & QBR <= 100 ~ 1,            # Natural
+    QBR >= 75 & QBR < 95 ~ 2,              # Good
+    QBR >= 55 & QBR < 75 ~ 3,              # Fair
+    QBR >= 30 & QBR < 55 ~ 4,              # Poor
+    QBR < 30 ~ 5,                           # Bad
+    TRUE ~ NA_real_
+  )
   )
 
 # Functions -----------------------------------------
+head(global_ds)
 
 # Function to Subsample Data Randomly
-sample_one_device_per_site_season <- function(dat) {
+sample_one_device_per_site_deployment <- function(dat, n_days = 10) {
+  
+  dat <- dat %>%
+    mutate(Date = as.Date(as.character(Date), format = "%Y%m%d"))
+  
+  # 1. Random device per Site × Deployment
   chosen_devices <- dat %>%
-    distinct(Site, Season, Device) %>%
-    group_by(Site, Season) %>%
+    distinct(Site, Deployment, Device) %>%
+    group_by(Site, Deployment) %>%
     slice_sample(n = 1) %>%
     ungroup()
   
-  dat %>%
-    semi_join(chosen_devices, by = c("Site", "Season", "Device"))
+  dat_subset <- dat %>%
+    semi_join(chosen_devices, by = c("Site", "Deployment", "Device"))
+  
+  # 2. Sample 10-day window
+  sampled <- dat_subset %>%
+    group_by(Site, Deployment, Device) %>%
+    group_modify(~{
+      
+      available_dates <- sort(unique(.x$Date))
+      
+      # if fewer than n_days exist, just keep all
+      if(length(available_dates) <= n_days){
+        return(.x)
+      }
+      
+      valid_starts <- available_dates[
+        available_dates <= max(available_dates) - (n_days - 1)
+      ]
+      
+      start_date <- sample(valid_starts, 1)
+      end_date <- start_date + (n_days - 1)
+      
+      .x %>% filter(Date >= start_date & Date <= end_date)
+      
+    }) %>%
+    ungroup()
+  
+  return(sampled)
 }
 
 
 
-# Function to fit model & extract CIs (PC1)
+# Function to fit model & extract CIs (either PC)
 fit_model_and_extract_ci <- function(dat, response_var) {
   
   formula_obj <- as.formula(
     paste0(response_var,
-           " ~ QBR * TimeRangeFactor * Season + ",
+           " ~ QBR_bin * TimeRangeFactor * Season + ",
            "Strahler * TimeRangeFactor * Season + ",
            "(1 | Site)")
   )
   
   model <- lmer(formula_obj, data = dat, REML = TRUE)
   
-  ci <- confint(model, method = "profile", parm = "beta_")
-  estimates <- fixef(model)
+  ci <- confint(model, method = "Wald")
+  ci <- ci[rownames(ci) %in% names(fixef(model)), ]
   
   tibble(
-    term = names(estimates),
-    estimate = as.numeric(estimates),
+    term = rownames(ci),
+    estimate = fixef(model)[rownames(ci)],
     lower = ci[,1],
     upper = ci[,2]
   )
@@ -85,7 +135,7 @@ fit_model_and_extract_ci <- function(dat, response_var) {
 
 # Run Iterations ---------------------------------
 set.seed(123)
-n_runs <- 50
+n_runs <- 200
 pcs <- c("PC1","PC2")
 
 all_results <- map_dfr(pcs, function(pc){
@@ -94,7 +144,9 @@ all_results <- map_dfr(pcs, function(pc){
   
   map_dfr(1:n_runs, function(i){
     
-    sampled_data <- sample_one_device_per_site_season(global_ds)
+    message("Iteration ", i)
+    
+    sampled_data <- sample_one_device_per_site_deployment(global_ds)
     
     fit_model_and_extract_ci(sampled_data, pc) %>%
       mutate(iteration = i,
@@ -104,12 +156,12 @@ all_results <- map_dfr(pcs, function(pc){
 
 # Save
 saveRDS(all_results,
-        "clean_data/datasets/modelconsistency/results_allPCs.rds")
+        "clean_data/datasets/modelconsistency/model5_results_allPCs.rds")
 
 
 
 # Evaluation of model  --------------------------------------------
-resultsall <- readRDS("clean_data/datasets/modelconsistency/results_allPCs.rds")
+resultsall <- readRDS("clean_data/datasets/modelconsistency/model5_results_allPCs.rds")
 
 # Basic Processing
 resultsall <- resultsall %>%
@@ -144,18 +196,6 @@ ggplot(summary_resultsall, aes(x = reorder(term, mean_est), y = mean_est)) +
 
 
 
-# Plot Sign stability
-ggplot(sign_stabilityall, aes(x = reorder(term, prop_significant), 
-                              y = prop_significant)) +
-  geom_col() +
-  coord_flip() +
-  theme_minimal() +
-  labs(
-    title = "Proportion of Subsamples Where Term is Significant (PC1)",
-    x = "Model Term",
-    y = "Proportion Significant"
-  )
-
 # Sign stability per PC / Term
 stability_df <- resultsall %>%
   group_by(term, PC) %>%
@@ -178,12 +218,12 @@ stability_df <- stability_df %>%
     # Main Season Effect
     term == "SeasonMonsoon" ~ "Time:Dawn (Monsoon shift)",
     # Main slopes - since dawn and dry season are references
-    term == "QBR" ~ "QBR:Dawn",
+    term == "QBR_bin" ~ "QBR:Dawn",
     term == "Strahler" ~ "Strahler:Dawn",
     # QBR × TIME (Dry season)
-    str_detect(term, "^QBR:TimeRangeFactorDay$") ~ "QBR:Day",
-    str_detect(term, "^QBR:TimeRangeFactorEvening$") ~ "QBR:Evening",
-    str_detect(term, "^QBR:TimeRangeFactorNight$") ~ "QBR:Night",
+    str_detect(term, "^QBR_bin:TimeRangeFactorDay$") ~ "QBR:Day",
+    str_detect(term, "^QBR_bin:TimeRangeFactorEvening$") ~ "QBR:Evening",
+    str_detect(term, "^QBR_bin:TimeRangeFactorNight$") ~ "QBR:Night",
     # STRAHLER × TIME (Dry season)
     str_detect(term, "^TimeRangeFactorDay:Strahler$") ~ "Strahler:Day",
     str_detect(term, "^TimeRangeFactorEvening:Strahler$") ~ "Strahler:Evening",
@@ -196,7 +236,7 @@ stability_df <- stability_df %>%
     str_detect(term, "^TimeRangeFactorNight:SeasonMonsoon$") ~
       "Time:Night (Monsoon shift)",
     # QBR × SEASON (Dawn shift)
-    term == "QBR:SeasonMonsoon" ~
+    term == "QBR_bin:SeasonMonsoon" ~
       "QBR:Dawn (Monsoon shift)",
     # STRAHLER × SEASON (Dawn shift)
     # handles both orders
@@ -204,9 +244,9 @@ stability_df <- stability_df %>%
                 "SeasonMonsoon:Strahler") ~
       "Strahler:Dawn (Monsoon shift)",
     # 3-WAY: QBR × TIME × SEASON MAn idk
-    str_detect(term, "^QBR:TimeRangeFactor.*:SeasonMonsoon$") ~
+    str_detect(term, "^QBR_bin:TimeRangeFactor.*:SeasonMonsoon$") ~
       str_replace(term,
-                  "QBR:TimeRangeFactor(.*):SeasonMonsoon",
+                  "QBR_bin:TimeRangeFactor(.*):SeasonMonsoon",
                   "QBR:\\1 (Monsoon shift)"),
     # 3-WAY: STRAHLER × TIME × SEASON
     str_detect(term, "^TimeRangeFactor.*:SeasonMonsoon:Strahler$") ~
