@@ -162,7 +162,7 @@ all_results <- map_dfr(pcs, function(pc){
 
 # Save
 saveRDS(all_results,
-        "clean_data/datasets/modelconsistency/model4_results_allPCs.rds")
+        "clean_data/datasets/modelconsistency/new2model4_results_allPCs.rds")
 
 
 # Final Sign Stability Plotting - PC1 & PC2  ---------------
@@ -184,7 +184,7 @@ combined_results <- bind_rows(resultsPC1, resultsPC2)
 
 
 # Evaluation of model  --------------------------------------------
-combined_results <- readRDS("clean_data/datasets/modelconsistency/model4_results_allPCs.rds")
+combined_results <- readRDS("clean_data/datasets/modelconsistency/new2model4_results_allPCs.rds")
 
 head(combined_results)
 
@@ -237,7 +237,7 @@ stability_df <- stability_df %>%
 
 # Clean data
 # Extract group and clean term labels for plotting
-plot_df <- plot_df %>%
+plot_df <- stability_df %>%
   mutate(
     # Extract group for faceting
     group = str_extract(term_clean, "^[^:]+"),
@@ -253,7 +253,7 @@ plot_df$group <- factor(
 )
 
 # Re-order y-axis by time labels (Morning / Day / Evening / Night)
-y_order <- c("Dawn", "Day", "Evening", "Night")  # includes Dawn for reference
+y_order <- c("Morning", "Day", "Evening", "Night")  # includes Dawn for reference
 plot_df$term_clean <- factor(
   plot_df$term_clean,
   levels = rev(y_order)
@@ -278,7 +278,7 @@ plot_df$group <- factor(
 )
 
 # Plot it
-ggplot(plot_df,
+model4consistency <- ggplot(plot_df,
        aes(x = PC,
            y = term_clean,
            fill = prop_significant)) +
@@ -313,3 +313,5 @@ ggplot(plot_df,
     axis.text.x = element_text(angle = 0),
     legend.position = "right"
   )
+
+ggsave(model4consistency, file="model4consistency.png", width=4, height=4)

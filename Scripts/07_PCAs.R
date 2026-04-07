@@ -24,6 +24,12 @@ sum25_songmeters_RL        <- read.csv("clean_data/datasets/indices_datasets/son
 
 cardamoms_RL       <- read.csv("clean_data/datasets/indices_datasets/cardamoms_RL_data.csv")
 
+singledevice            <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
+
+singledevice2324 <-  singledevice %>%
+  filter(Deployment_Season != "Jun 2025")
+
+head(singledevice2324)
 
 #### Function to run subset PCAs - allowing correct timing --------------------
 
@@ -160,6 +166,9 @@ multi25_1in5_pca       <- run_pca_subset(multi25_1in5,            "00:00:00", "2
 global_pca             <- run_pca_subset(global,                  "00:00:00", "23:59:00")
 songmeter25_pca        <- run_pca_subset(sum25_songmeters,        "00:00:00", "23:59:00")
 
+single_pca2324             <- run_pca_subset(singledevice2324,            "00:00:00", "23:59:00")
+
+
 # ---- Align PCAs ---- # This step is nessesary for later Mixed Models
 single_pca             <- align_pca_scores(single_pca,                  ref_loadings)
 continuous_single_pca  <- align_pca_scores(continuous_single_pca,       ref_loadings)
@@ -167,6 +176,9 @@ multi25_pca            <- align_pca_scores(multi25_pca,                 ref_load
 multi25_1in5_pca       <- align_pca_scores(multi25_1in5_pca,            ref_loadings)
 global_pca             <- align_pca_scores(global_pca,                  ref_loadings)
 songmeter25_pca        <- align_pca_scores(songmeter25_pca,             ref_loadings)
+
+single_pca2324             <- align_pca_scores(single_pca2324, ref_loadings)
+
 
 # ---- Bind Metadata ----
 single_scores             <- bind_metadata(single_pca,            singledevice,            "00:00:00", "23:59:00")
@@ -176,6 +188,8 @@ multi25_1in5_scores       <- bind_metadata(multi25_1in5_pca,      multi25_1in5, 
 global_scores             <- bind_metadata(global_pca,            global,                  "00:00:00", "23:59:00")
 songmeter25_scores        <- bind_metadata(songmeter25_pca,       sum25_songmeters,        "00:00:00", "23:59:00")
 
+single_pca2324_scores        <- bind_metadata(single_pca2324,       singledevice2324,        "00:00:00", "23:59:00")
+
 # ---- Save Files ----
 write.csv(single_scores,            "clean_data/datasets/PCAs/single_pca.csv",              row.names = FALSE)
 write.csv(continuous_single_scores, "clean_data/datasets/PCAs/continuous_single_pca.csv",   row.names = FALSE)
@@ -183,6 +197,9 @@ write.csv(multi25_scores,           "clean_data/datasets/PCAs/multi25_pca.csv", 
 write.csv(multi25_1in5_scores,      "clean_data/datasets/PCAs/multi25_1in5_pca.csv",        row.names = FALSE)
 write.csv(global_scores,            "clean_data/datasets/PCAs/global2325_pca.csv",          row.names = FALSE)
 write.csv(songmeter25_scores,       "clean_data/datasets/PCAs/songmeters25_pca.csv",        row.names = FALSE)
+
+
+write.csv(single_pca2324_scores,       "clean_data/datasets/PCAs/singledevice2324_pca.csv",        row.names = FALSE)
 
 ### ================================
 ### RUN + SAVE RAINLESS PCA RESULTS

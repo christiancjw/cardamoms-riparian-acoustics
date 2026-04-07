@@ -16,6 +16,29 @@ sum25_songmeters_RL       <- read.csv("clean_data/datasets/indices_datasets/song
 
 cardamoms_RL       <- read.csv("clean_data/datasets/indices_datasets/cardamomsRL_singledevice_data.csv")
 
+# Fix Kronomh
+# function to update QBR_Score for Kronomh
+fix_qbr <- function(df) {
+  df %>%
+    mutate(QBR_Score = ifelse(Site == "Kronomh", 85, QBR_Score))
+}
+
+# apply to all datasets
+global_singledevice      <- fix_qbr(global_singledevice)
+continuous_singledevice  <- fix_qbr(continuous_singledevice)
+multi25                  <- fix_qbr(multi25)
+multi25_1in5             <- fix_qbr(multi25_1in5)
+global_data              <- fix_qbr(global_data)
+sum25_songmeters         <- fix_qbr(sum25_songmeters)
+
+global_singledevice_RL     <- fix_qbr(global_singledevice_RL)
+continuous_singledevice_RL <- fix_qbr(continuous_singledevice_RL)
+multi25_RL                 <- fix_qbr(multi25_RL)
+multi25_1in5_RL            <- fix_qbr(multi25_1in5_RL)
+global_data_RL             <- fix_qbr(global_data_RL)
+sum25_songmeters_RL        <- fix_qbr(sum25_songmeters_RL)
+
+cardamoms_RL              <- fix_qbr(cardamoms_RL)
 
 ### Bin QBR and Strahler ------------------
 bin_metadata <- function(df) {

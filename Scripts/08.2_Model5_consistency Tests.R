@@ -154,14 +154,14 @@ all_results <- map_dfr(pcs, function(pc){
   })
 })
 
-# Save
+t876g541# Save
 saveRDS(all_results,
-        "clean_data/datasets/modelconsistency/model5_results_allPCs.rds")
+        "clean_data/datasets/modelconsistency/newmodel5_results_allPCs.rds")
 
 
 
 # Evaluation of model  --------------------------------------------
-resultsall <- readRDS("clean_data/datasets/modelconsistency/model5_results_allPCs.rds")
+resultsall <- readRDS("clean_data/datasets/modelconsistency/newmodel5_results_allPCs.rds")
 
 # Basic Processing
 resultsall <- resultsall %>%
@@ -211,15 +211,15 @@ stability_df <- stability_df %>%
   
   mutate(term_clean = case_when(
     # Main Time Effects (Dry ref)
-    term == "(Intercept)" ~ "Time:Dawn",
+    term == "(Intercept)" ~ "Time:Morning",
     term == "TimeRangeFactorDay" ~ "Time:Day",
     term == "TimeRangeFactorEvening" ~ "Time:Evening",
     term == "TimeRangeFactorNight" ~ "Time:Night",
     # Main Season Effect
-    term == "SeasonMonsoon" ~ "Time:Dawn (Monsoon shift)",
+    term == "SeasonMonsoon" ~ "Time:Morning (Monsoon shift)",
     # Main slopes - since dawn and dry season are references
-    term == "QBR_bin" ~ "QBR:Dawn",
-    term == "Strahler" ~ "Strahler:Dawn",
+    term == "QBR_bin" ~ "QBR:Morning",
+    term == "Strahler" ~ "Strahler:Morning",
     # QBR × TIME (Dry season)
     str_detect(term, "^QBR_bin:TimeRangeFactorDay$") ~ "QBR:Day",
     str_detect(term, "^QBR_bin:TimeRangeFactorEvening$") ~ "QBR:Evening",
@@ -237,12 +237,12 @@ stability_df <- stability_df %>%
       "Time:Night (Monsoon shift)",
     # QBR × SEASON (Dawn shift)
     term == "QBR_bin:SeasonMonsoon" ~
-      "QBR:Dawn (Monsoon shift)",
+      "QBR:Morning (Monsoon shift)",
     # STRAHLER × SEASON (Dawn shift)
     # handles both orders
     term %in% c("Strahler:SeasonMonsoon",
                 "SeasonMonsoon:Strahler") ~
-      "Strahler:Dawn (Monsoon shift)",
+      "Strahler:Morning (Monsoon shift)",
     # 3-WAY: QBR × TIME × SEASON MAn idk
     str_detect(term, "^QBR_bin:TimeRangeFactor.*:SeasonMonsoon$") ~
       str_replace(term,
@@ -291,13 +291,13 @@ plot_df <- plot_df %>%
 # 3. Enforce Correct Term Ordering
 y_order <- c(
   # Time
-  "Time:Dawn", "Time:Day", "Time:Evening", "Time:Night",
+  "Time:Morning", "Time:Day", "Time:Evening", "Time:Night",
   
   # QBR
-  "QBR:Dawn", "QBR:Day", "QBR:Evening", "QBR:Night",
+  "QBR:Morning", "QBR:Day", "QBR:Evening", "QBR:Night",
   
   # Strahler
-  "Strahler:Dawn", "Strahler:Day",
+  "Strahler:Morning", "Strahler:Day",
   "Strahler:Evening", "Strahler:Night"
 )
 
@@ -334,7 +334,7 @@ plot_df$group <- factor(
 )
 
 # Plot the bitch
-ggplot(plot_df,
+model5consistency <- ggplot(plot_df,
        aes(x = PC_Season,
            y = term_clean,
            fill = prop_significant)) +
@@ -370,3 +370,4 @@ ggplot(plot_df,
     legend.position = "right"
   )
 
+ggsave(model5consistency, file="model4consistency.png", width=6, height=4)

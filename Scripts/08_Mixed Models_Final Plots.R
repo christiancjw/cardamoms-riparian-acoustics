@@ -11,13 +11,15 @@ library(MuMIn) # for r2 values GLMM
 library(purrr) # For diel analysis
 library(patchwork) # For putting plots together
 library(emmeans) # For plotting true effect sizes
+library(lmerTest)
 
 # Read in Data
-global_ds <- read.csv("clean_data/datasets/PCAs/rainless_single_pca.csv")
+final_ds <- read.csv("clean_data/datasets/PCAs/rainless_single_pca.csv")
+
 
 # Check Data
-head(global_ds)
-str(global_ds)
+head(final_ds)
+str(final_ds)
 
 # Set Colour Ordering
 
@@ -85,7 +87,7 @@ strahler_order <- c("1st Order", "2nd Order", "3rd Order", "4th Order", "5th Ord
 
 # Add Seasonal and Time Range variables to the dataset
 
-global_ds <- global_ds %>%
+final_ds <- final_ds %>%
   mutate(
     Deployment = case_when(
       Date >= 20231116 & Date <= 20231203 ~ "Monsoon 2023",
@@ -96,7 +98,7 @@ global_ds <- global_ds %>%
       TRUE ~ NA_character_
     ))
 
-global_ds <- global_ds %>%
+final_ds <- final_ds %>%
   mutate(
     Season = case_when(
       Date >= 20231116 & Date <= 20231203 ~ "Monsoon",
@@ -110,7 +112,7 @@ global_ds <- global_ds %>%
   filter(!is.na(Season))
 
 # Create a TimeRange factor
-global_ds <- global_ds %>%
+final_ds <- final_ds %>%
   mutate(Time_num = as.numeric(Time)) %>% 
   # Convert numeric time into HHMMSS string with 6 digits
   mutate(TimeHHMMSS = str_pad(Time_num, width = 6, side = "left", pad = "0")) %>%
@@ -132,10 +134,10 @@ global_ds <- global_ds %>%
   )
   )
 
-head(global_ds)
+head(final_ds)
 
 # For plotting - rename strahler to strahler order
-global_ds <- global_ds %>%
+final_ds <- final_ds %>%
   rename(Strahler_Order = Strahler) %>%   # rename column
   mutate(
     QBR_Class = case_when( # Renaming QBR terms too
@@ -149,8 +151,8 @@ global_ds <- global_ds %>%
   )
 
 # Fiddle with dates and times
-global_ds <-
-  global_ds %>%
+final_ds <-
+  final_ds %>%
   # convert Date to a date
   mutate(date = ymd(Date)) %>%
   # extract month
@@ -162,7 +164,7 @@ global_ds <-
 
 
 # Show data structure 
-ggplot(global_ds,
+ggplot(final_ds,
        aes(x = QBR, y = Strahler_Order, colour = Site)) +
   geom_point() +
   theme_minimal()
@@ -171,14 +173,14 @@ ggplot(global_ds,
 
 # Boxplots -----------------
 # Single Device
-ggplot(global_ds, aes(factor(QBR_bin), PC1, fill = factor(QBR_bin))) +
+ggplot(final_ds, aes(factor(QBR_bin), PC1, fill = factor(QBR_bin))) +
   geom_violin(alpha = 0.25, color = NA) + labs(x = "QBR", y = "Compound Index 1") +
   geom_boxplot(width = 0.15, outlier.size = 0.3, outlier.alpha = 0.2) +
   scale_fill_manual(values = strahler_colors) +
   theme_minimal() + ylim(-12.5, 3) + theme(legend.position = "None")
 
 
-ggplot(global_ds, aes(factor(Strahler_Order), PC1, fill = factor(Strahler_Order))) +
+ggplot(final_ds, aes(factor(Strahler_Order), PC1, fill = factor(Strahler_Order))) +
   geom_violin(alpha = 0.5, color = NA) + labs(x = "Strahler Order", y = "Compound Index 1") +
   geom_boxplot(width = 0.15, outlier.size = 0.8, outlier.alpha = 0.2) +
   scale_fill_manual(values = strahler_colors) +
@@ -187,12 +189,12 @@ ggplot(global_ds, aes(factor(Strahler_Order), PC1, fill = factor(Strahler_Order)
 # Full Scatter Plot  ------
 
 # Ensure Strahler is a factor for grouping
-global_ds <- global_ds %>%
+final_ds <- final_ds %>%
   mutate(Strahler_f = factor(Strahler))
 
 #
-ggplot(global_ds,
-       aes(x = PC1, y = PC2, color = Strahler_Class)) +
+ggplot(final_ds,
+       aes(x = PC1, y = PC2, color = QBR_bin)) +
   # Raw points
   geom_point(alpha = 0.3, size = 0.05) +
   
@@ -214,7 +216,7 @@ ggplot(global_ds,
 # Time based scatters --------
 
 # Bin
-global_ds <- global_ds %>%
+final_ds <- final_ds %>%
   mutate(
     TimeHHMMSS = sprintf("%06s", TimeHHMMSS),  # ensure 6 digits
     TimeBin = case_when(
@@ -234,7 +236,7 @@ global_ds <- global_ds %>%
 # Plot
 
 # Strahler Colours
-ggplot(global_ds,
+ggplot(final_ds,
        aes(x = PC1, y = PC2, color = Strahler_f)) +
   geom_point(alpha = 0.3, size = 0.5) +
   stat_ellipse(level = 0.95, linewidth = 0.8) +
@@ -251,7 +253,7 @@ ggplot(global_ds,
 
 
 #QBR Colour 
-ggplot(global_ds,
+ggplot(final_ds,
        aes(x = PC1, y = PC2, color = QBR_Class)) +
   geom_point(alpha = 0.3, size = 0.05) +
   stat_ellipse(level = 0.95, linewidth = 0.8) +
@@ -263,12 +265,12 @@ ggplot(global_ds,
   labs(
     x = "Compound Index 1 (37.9% Variance)",
     y = "Compound Index 2 (14.8% Variance)",
-    color = "Strahler Order",
-    title = "Acoustic Structure Across Stream Order by Time of Day"
+    color = "QBR Class",
+    title = "Acoustic Structure Across QBR Classes by Time of Day"
   )
 
 # Seasonal Scatter ------
-global_ds <- global_ds %>%
+final_ds <- final_ds %>%
   mutate(
     Season = factor(Season, levels = c("Dry", "Monsoon")),
     Strahler_f = factor(Strahler)
@@ -315,11 +317,11 @@ palettes <- list(
   Strahler_Order = strahler_colors
 )
 
-p_Strahler_Dry <- plot_seasonal_scatter(global_ds, "Strahler_Class", "Dry")
-p_Strahler_Monsoon <- plot_seasonal_scatter(global_ds, "Strahler_Class", "Monsoon")
+p_Strahler_Dry <- plot_seasonal_scatter(final_ds, "Strahler_Class", "Dry")
+p_Strahler_Monsoon <- plot_seasonal_scatter(final_ds, "Strahler_Class", "Monsoon")
 
-p_QBR_Dry <- plot_seasonal_scatter(global_ds, "QBR_Class", "Dry")
-p_QBR_Monsoon <- plot_seasonal_scatter(global_ds, "QBR_Class", "Monsoon")
+p_QBR_Dry <- plot_seasonal_scatter(final_ds, "QBR_Class", "Dry")
+p_QBR_Monsoon <- plot_seasonal_scatter(final_ds, "QBR_Class", "Monsoon")
 
 Strahler_seasonal <- p_Strahler_Dry + p_Strahler_Monsoon +
   plot_layout(ncol = 2) +
@@ -335,7 +337,7 @@ QBR_seasonal
 
 
 # Seasonal Scatter (Split by Times) ----------------
-global_ds <- global_ds %>%
+final_ds <- final_ds %>%
   mutate(
     Season = factor(Season, levels = c("Dry", "Monsoon")),
     TimeRangeFactor = factor(TimeRangeFactor,
@@ -380,19 +382,19 @@ plot_season_time_scatter <- function(df, colour_var, season_filter) {
     )
 }
 
-Strahler_Dry_Time <- plot_season_time_scatter(global_ds,
+Strahler_Dry_Time <- plot_season_time_scatter(final_ds,
                                               "Strahler_Class",
                                               "Dry")
 
-Strahler_Monsoon_Time <- plot_season_time_scatter(global_ds,
+Strahler_Monsoon_Time <- plot_season_time_scatter(final_ds,
                                                   "Strahler_Class",
                                                   "Monsoon")
 
-QBR_Dry_Time <- plot_season_time_scatter(global_ds,
+QBR_Dry_Time <- plot_season_time_scatter(final_ds,
                                          "QBR_Class",
                                          "Dry")
 
-QBR_Monsoon_Time <- plot_season_time_scatter(global_ds,
+QBR_Monsoon_Time <- plot_season_time_scatter(final_ds,
                                              "QBR_Class",
                                              "Monsoon")
 
@@ -402,14 +404,60 @@ Strahler_Monsoon_Time
 QBR_Dry_Time
 QBR_Monsoon_Time
 
+# Model 3 -----------
+model3_pc1 <- lmer(PC1 ~ QBR_bin  +
+                       Strahler_Order  +
+                           (1 | Site) +  
+                           (1 | Season), 
+                            data = final_ds)
+
+
+anova(model3_pc1)
+
+# Check variance 
+r.squaredGLMM(model3_pc1)
+
+# Check VIF
+vif(model3_pc1) # higher than 5 or 10 is bad
+
+# Show Fixed EFfect Values for Model 
+broom.mixed::tidy(model3_pc1, effects = "fixed")
+# Show Random Effect Values for model
+broom.mixed::tidy(model3_pc1, effects = "ran_pars")
+
+# Confidence Int ervals PC1
+confint(model3_pc1, method="Wald")
+profconfintPC1 <- confint(model4_PC1, method="profile")
+model3_bootconfintPC1 <- confint(model3_PC1, method="boot")
+
+profconfintPC1
+# R2 Values
+model4_r2_vals_PC1 <- r.squaredGLMM(model3_pc1)
+model4_r2_vals_PC1
+
+model3_PC2 <- lmer(PC2 ~ QBR_bin +
+                                   Strahler_Order  +
+                                   (1 | Site) + (1 | Season),
+                                 data = final_ds)
+
+confint(model3_pc2, method="Wald")
+r.squaredGLMM(model3_PC2)
+anova(model3_PC2)
+
+model3_bootconfintPC2 <- confint(model3_PC2, method="boot")
+
+
 # Model 4 (Season as Random) ---------------------------
+# PC1 + Explorations
 
 # PC1 + Explorations
 model4_PC1 <- lmer(PC1 ~ QBR_bin * TimeRangeFactor +
                      Strahler_Order * TimeRangeFactor +
                      (1 | Site) +
                      (1 | Season), 
-                   data = global_ds)
+                   data = final_ds)
+
+anova(model4_PC1)
 
 # Check variance 
 r.squaredGLMM(model4_PC1)
@@ -439,7 +487,7 @@ model4_PC2 <- lmer(PC2 ~ QBR_bin * TimeRangeFactor +
                      Strahler_Order * TimeRangeFactor +
                      (1 | Site)
                    + (1 | Season), 
-                   data = global_ds)
+                   data = final_ds)
 
 # Check variance 
 r.squaredGLMM(model4_PC2)
@@ -470,8 +518,11 @@ coef(model4_PC2)  # gives raw fixed effects
 model5_PC1 <- lmer(PC1 ~ QBR_bin * TimeRangeFactor * Season +
                      Strahler_Order * TimeRangeFactor * Season +
                      (1 | Site), 
-                   data = global_ds)
+                   data = final_ds)
 
+anova(model5_PC1)
+
+anova(model4_PC1) 
 
 # Check variance 
 r.squaredGLMM(model5_PC1)
@@ -504,7 +555,7 @@ coef(model5_PC1)  # gives raw fixed effects
 model5_PC2 <- lmer(PC2 ~ QBR_bin * TimeRangeFactor * Season +
                      Strahler_Order * TimeRangeFactor * Season +
                      (1 | Site), 
-                   data = global_ds)
+                   data = final_ds)
 
 # Check Variance 
 r.squaredGLMM(model5_PC2)
@@ -528,25 +579,8 @@ model5_r2_vals_PC2
 
 coef(model5_PC2)  # gives raw fixed effects
 
-# Mixed Models Stastistics for Results ----------------------
-extract_model_terms <- function(model, model_name){
-  
-  broom.mixed::tidy(model, effects = "fixed", conf.int = TRUE) %>%
-    select(term, estimate, std.error, statistic, conf.low, conf.high) %>%
-    mutate(model = model_name)
-  
-}
-
-model_terms <- bind_rows(
-  extract_model_terms(model4_PC1, "Model4_PC1"),
-  extract_model_terms(model4_PC2, "Model4_PC2"),
-  extract_model_terms(model5_PC1, "Model5_PC1"),
-  extract_model_terms(model5_PC2, "Model5_PC2")
-)
-
-write_csv(model_terms, "mixed_model_coefficients.csv")
-
 # Mixed Models Stastistics for Results V2 ----------------------
+
 # Function to extract fixed + random effects with bootstrap CIs
 extract_model_terms_boot_all <- function(model, model_name, nboot = 1000){
   
@@ -591,297 +625,26 @@ model_terms_boot_all <- bind_rows(
 # --- Export ---
 write.csv(model_terms_boot_all, "mixed_model_coefficients_boot_all.csv")
 
-# Model 4 fixed effects with CI (wald) -------------
-extract_coefs <- function(model, pc_label){
-  
-  broom.mixed::tidy(model, effects = "fixed", conf.int = TRUE) %>%
-    filter(term != "(Intercept)") %>%
-    mutate(
-      PC = pc_label,
-      term_clean = str_replace_all(term, "TimeRangeFactor", ""),
-      term_clean = str_replace_all(term_clean, ":", " × ")
-    )
-}
 
-coef_PC1 <- extract_coefs(model4_PC1, "PC1")
-coef_PC2 <- extract_coefs(model4_PC2, "PC2")
-
-coef_df <- bind_rows(coef_PC1, coef_PC2)
-
-# Forest plot (wald)
-ggplot(coef_df,
-       aes(x = estimate,
-           y = reorder(term_clean, estimate),
-           color = PC)) +
-  geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_point(size = 3) +
-  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high),
-                 height = 0.2) +
-  facet_wrap(~PC, scales = "free_x") +
-  theme_minimal() +
-  labs(x = "Effect size (β)",
-       y = "",
-       title = "Fixed Effects on Acoustic Structure (PC1 & PC2)")
-
-
-# Model 4 fixed effects with CI (boot) ---------------------------
-bootconfintPC1 <- confint(model4_PC1, method="boot")
-bootconfintPC2 <- confint(model4_PC2, method="boot")
-
-
-# Convert Boot to Tidy Data
-boot_PC1 <- bootconfintPC1 %>%
-  as.data.frame() %>%
-  rownames_to_column("term") %>%
-  rename(
-    conf.low  = `2.5 %`,
-    conf.high = `97.5 %`
-  ) %>%
-  filter(!str_detect(term, "^\\."))
-
-boot_PC2 <- bootconfintPC2 %>%
-  as.data.frame() %>%
-  rownames_to_column("term") %>%
-  rename(
-    conf.low  = `2.5 %`,
-    conf.high = `97.5 %`
-  ) %>%
-  filter(!str_detect(term, "^\\."))
-
-
-# Extract model coefficients
-coef_PC1 <- broom.mixed::tidy(model4_PC1, effects = "fixed") %>%
-  select(term, estimate) %>%
-  left_join(boot_PC1, by = "term") %>%
-  mutate(PC = "PC1")
-
-coef_PC2 <- broom.mixed::tidy(model4_PC2, effects = "fixed") %>%
-  select(term, estimate) %>%
-  left_join(boot_PC2, by = "term") %>%
-  mutate(PC = "PC2")
-
-# Combine PCs 
-coef_df <- bind_rows(coef_PC1, coef_PC2)
-
-# Clean Terms
-coef_df <- coef_df %>%
-  mutate(
-    term_clean = case_when(
-      
-      # QBR slopes
-      term == "QBR" ~ "Dawn × QBR",
-      term == "QBR:TimeRangeFactorDay" ~ "Day × QBR",
-      term == "QBR:TimeRangeFactorEvening" ~ "Evening × QBR",
-      term == "QBR:TimeRangeFactorNight" ~ "Night × QBR",
-      
-      # Strahler slopes
-      term == "Strahler" ~ "Dawn × Strahler",
-      term == "TimeRangeFactorDay:Strahler" ~ "Day × Strahler",
-      term == "TimeRangeFactorEvening:Strahler" ~ "Evening × Strahler",
-      term == "TimeRangeFactorNight:Strahler" ~ "Night × Strahler",
-      
-      # Time contrasts
-      term == "(Intercept)" ~ "Dawn",
-      term == "TimeRangeFactorDay" ~ "Day",
-      term == "TimeRangeFactorEvening" ~ "Evening",
-      term == "TimeRangeFactorNight" ~ "Night",
-      
-      TRUE ~ term
-    )
-  )
-
-# Separate the QBR and Strahler Terms
-coef_df <- coef_df %>%
-  mutate(
-    effect_group = case_when(
-      str_detect(term, "^QBR") ~ "QBR",
-      str_detect(term, "Strahler") ~ "Strahler",
-      TRUE ~ "Time"
-    )
-  )
-
-# Filter Datasets
-coef_qbr <- coef_df %>%
-  filter(effect_group == "QBR") %>%
-  mutate(
-    term_clean = if_else(
-      effect_group == "QBR",
-      str_remove(term_clean, " × QBR"),
-      term_clean
-    )
-  )
-
-coef_stra <- coef_df %>%
-  filter(effect_group == "Strahler") %>%
-  mutate(
-    term_clean = if_else(
-      effect_group == "Strahler",
-      str_remove(term_clean, " × Strahler"),
-      term_clean
-    )
-  )
-
-# Model 4 Fixed Effects (Boot2) ----------------
-library(tidyverse)
-
-boot_PC1 <- as.data.frame(bootconfintPC1) %>%
-  rownames_to_column("term")
-
-boot_PC2 <- as.data.frame(bootconfintPC2) %>%
-  rownames_to_column("term")
-
-
-boot_PC1 <- boot_PC1 %>%
-  rename(conf.low = `2.5 %`,
-         conf.high = `97.5 %`)
-
-boot_PC2 <- boot_PC2 %>%
-  rename(conf.low = `2.5 %`,
-         conf.high = `97.5 %`)
-
-
-# Reconstruct Slopes
-make_slopes <- function(df, PC){
-  
-  tibble(
-    
-    PC = PC,
-    
-    Predictor = rep(c("QBR","Strahler"), each = 4),
-    
-    Time = rep(c("Morning (Intercept)","Day","Evening","Night"), 2),
-    
-    conf.low = c(
-      df$conf.low[df$term=="QBR_bin"],
-      df$conf.low[df$term=="QBR_bin"] +
-        df$conf.low[df$term=="QBR_bin:TimeRangeFactorDay"],
-      df$conf.low[df$term=="QBR_bin"] +
-        df$conf.low[df$term=="QBR_bin:TimeRangeFactorEvening"],
-      df$conf.low[df$term=="QBR_bin"] +
-        df$conf.low[df$term=="QBR_bin:TimeRangeFactorNight"],
-      
-      df$conf.low[df$term=="Strahler_Order"],
-      df$conf.low[df$term=="Strahler_Order"] +
-        df$conf.low[df$term=="TimeRangeFactorDay:Strahler_Order"],
-      df$conf.low[df$term=="Strahler_Order"] +
-        df$conf.low[df$term=="TimeRangeFactorEvening:Strahler_Order"],
-      df$conf.low[df$term=="Strahler_Order"] +
-        df$conf.low[df$term=="TimeRangeFactorNight:Strahler_Order"]
-    ),
-    
-    conf.high = c(
-      df$conf.high[df$term=="QBR_bin"],
-      df$conf.high[df$term=="QBR_bin"] +
-        df$conf.high[df$term=="QBR_bin:TimeRangeFactorDay"],
-      df$conf.high[df$term=="QBR_bin"] +
-        df$conf.high[df$term=="QBR_bin:TimeRangeFactorEvening"],
-      df$conf.high[df$term=="QBR_bin"] +
-        df$conf.high[df$term=="QBR_bin:TimeRangeFactorNight"],
-      
-      df$conf.high[df$term=="Strahler_Order"],
-      df$conf.high[df$term=="Strahler_Order"] +
-        df$conf.high[df$term=="TimeRangeFactorDay:Strahler_Order"],
-      df$conf.high[df$term=="Strahler_Order"] +
-        df$conf.high[df$term=="TimeRangeFactorEvening:Strahler_Order"],
-      df$conf.high[df$term=="Strahler_Order"] +
-        df$conf.high[df$term=="TimeRangeFactorNight:Strahler_Order"]
-    )
-  )
-}
-
-# Create Dataset
-boot_slopes <- bind_rows(
-  make_slopes(boot_PC1, "PC1"),
-  make_slopes(boot_PC2, "PC2")
+# Model 3:
+model_terms_boot_all <- bind_rows(
+  extract_model_terms_boot_all(model3_PC1, "Model3_PC1"),
+  extract_model_terms_boot_all(model3_PC2, "Model3_PC2")
 )
 
-# Plotting Order
-boot_slopes$Time <- factor(
-  boot_slopes$Time,
-  levels = c("Night","Morning (Intercept)","Day","Evening")
-)
+write.csv(model_terms_boot_all, "mixed_model3_coefficients_boot_all.csv")
 
-# Plot
-model4_effect_PC1_QBR <- boot_slopes %>%
-  filter(PC=="PC1", Predictor=="QBR") %>%
-  ggplot(aes(x = Time)) +
-  geom_hline(yintercept = 0, linetype="dashed") +
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.2) +
-  geom_point(aes(y = (conf.low + conf.high)/2),
-             size = 3) + 
-  theme_classic() +  ylim(-0.8, 0.6) +
-  theme(
-    axis.title.x = element_blank(),# remove x-axis labels
-    axis.ticks.x = element_blank(),    # remove x-axis ticks
-    axis.line.x = element_blank()     # remove x-axis line
-  )  + labs(title = "QBR", x = element_blank(), y = "Model 4 Slope")
-
-model4_effect_PC1_QBR
-
-
-model4_effect_PC1_Strahler <- boot_slopes %>%
-  filter(PC=="PC1", Predictor=="Strahler") %>%
-  ggplot(aes(x = Time)) +
-  geom_hline(yintercept = 0, linetype="dashed") +
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.2) +
-  geom_point(aes(y = (conf.low + conf.high)/2),
-             size = 3) +
-  theme_classic() +  ylim(-0.8, 0.6) +
-  theme(
-    axis.title.x = element_blank(),# remove x-axis labels
-    axis.ticks.x = element_blank(),    # remove x-axis ticks
-    axis.line.x = element_blank()     # remove x-axis line
-  )  + labs(title = "Strahler Order", x = element_blank(), y = element_blank())
-
-model4_effect_PC1_Strahler
-
-
-model4_effect_PC2_QBR <- boot_slopes %>%
-  filter(PC=="PC2", Predictor=="QBR") %>%
-  ggplot(aes(x = Time)) +
-  geom_hline(yintercept = 0, linetype="dashed") +
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.2) +
-  geom_point(aes(y = (conf.low + conf.high)/2),
-             size = 3) + 
-  theme_classic() +  ylim(-0.8, 0.6) +
-  theme(
-    axis.title.x = element_blank(),# remove x-axis labels
-    axis.ticks.x = element_blank(),    # remove x-axis ticks
-    axis.line.x = element_blank()     # remove x-axis line
-  )  + labs(title = "QBR", x = element_blank(), y = "Model 4 Slope")
-
-model4_effect_PC2_QBR
-
-model4_effect_PC2_Strahler <- boot_slopes %>%
-  filter(PC=="PC2", Predictor=="Strahler") %>%
-  ggplot(aes(x = Time)) +
-  geom_hline(yintercept = 0, linetype="dashed") +
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                width = 0.2) +
-  geom_point(aes(y = (conf.low + conf.high)/2),
-             size = 3) +
-  theme_classic() +  ylim(-0.8, 0.6) +
-  theme(
-    axis.title.x = element_blank(),# remove x-axis labels
-    axis.ticks.x = element_blank(),    # remove x-axis ticks
-    axis.line.x = element_blank()     # remove x-axis line
-  )  + labs(title = "Strahler Order", x = element_blank(), y = element_blank())
-
-model4_effect_PC2_Strahler
 
 # Model 4 True Slopes (emmeans) --------------------------------
 
 # Strahler slopes by time
 stra_slopes_PC1 <- emtrends(model4_PC1,
                             ~ TimeRangeFactor,
-                            var = "Strahler")
+                            var = "Strahler_Order")
 
 stra_slopes_PC2 <- emtrends(model4_PC2,
                             ~ TimeRangeFactor,
-                            var = "Strahler")
+                            var = "Strahler_Order")
 
 # QBR slopes by time
 qbr_slopes_PC1 <- emtrends(model4_PC1,
@@ -894,10 +657,10 @@ qbr_slopes_PC2 <- emtrends(model4_PC2,
 
 # Convert to dataframes
 stra_PC1_df <- as.data.frame(stra_slopes_PC1) %>%
-  mutate(PC = "PC1", Predictor = "Strahler")
+  mutate(PC = "PC1", Predictor = "Strahler_Order")
 
 stra_PC2_df <- as.data.frame(stra_slopes_PC2) %>%
-  mutate(PC = "PC2", Predictor = "Strahler")
+  mutate(PC = "PC2", Predictor = "Strahler_Order")
 
 qbr_PC1_df <- as.data.frame(qbr_slopes_PC1) %>%
   mutate(PC = "PC1", Predictor = "QBR_bin")
@@ -914,22 +677,6 @@ slopes_df <- bind_rows(
 )
 
 # Ploting helper: set the timings
-
-# Convert TimeRangeFactor to POSIXct for plotting
-slopes_df <- slopes_df %>%
-  mutate(
-    # Assign times for alignment with diel plots
-    Time_num = case_when(
-      TimeRangeFactor == "Night"   ~ hms("04:00:00"),
-      TimeRangeFactor == "Morning" ~ hms("10:00:00"),
-      TimeRangeFactor == "Day"     ~ hms("16:00:00"),
-      TimeRangeFactor == "Evening" ~ hms("22:00:00")
-    ),
-    # Convert to POSIXct for ggplot
-    Time_POSIX = as.POSIXct(Time_num, origin = "1970-01-01", tz = "UTC"),
-    # Keep a separate column for x-axis labels
-    Time_label = TimeRangeFactor
-  )
 
 # Plot PC1 QBR Slope
 pc1_qbr <- slopes_df %>%
@@ -952,10 +699,10 @@ effectplot_QBR_PC1 <- ggplot(pc1_qbr, aes(x = TimeRangeFactor, y = QBR_bin.trend
 
 # Plot PC1 Strahler Slope
 pc1_stra <- slopes_df %>%
-  filter(PC == "PC1", Predictor == "Strahler") %>%
+  filter(PC == "PC1", Predictor == "Strahler_Order") %>%
   mutate(TimeRangeFactor = factor(TimeRangeFactor, levels = c("Night", "Morning","Day","Evening")))
 
-effectplot_strahler_PC1 <- ggplot(pc1_stra, aes(x = TimeRangeFactor, y = Strahler.trend)) +
+effectplot_strahler_PC1 <- ggplot(pc1_stra, aes(x = TimeRangeFactor, y = Strahler_Order.trend)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.2) +
@@ -970,11 +717,11 @@ effectplot_strahler_PC1 <- ggplot(pc1_stra, aes(x = TimeRangeFactor, y = Strahle
   )
 
 # Plot PC2 QBR Slope
-pc1_qbr <- slopes_df %>%
+pc2_qbr <- slopes_df %>%
   filter(PC == "PC2", Predictor == "QBR_bin") %>%
   mutate(TimeRangeFactor = factor(TimeRangeFactor, levels = c("Night", "Morning","Day","Evening")))
 
-effectplot_QBR_PC2 <- ggplot(pc1_qbr, aes(x = TimeRangeFactor, y = QBR_bin.trend)) +
+effectplot_QBR_PC2 <- ggplot(pc2_qbr, aes(x = TimeRangeFactor, y = QBR_bin.trend)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.2) +
@@ -985,15 +732,15 @@ effectplot_QBR_PC2 <- ggplot(pc1_qbr, aes(x = TimeRangeFactor, y = QBR_bin.trend
     axis.text.x = element_blank(),    # remove x-axis labels
     axis.ticks.x = element_blank(),    # remove x-axis ticks
     axis.line.x = element_blank()     # remove x-axis line
-  ) + ylim (-0.6, 0.6)
+  ) + ylim (-0.6, 0.7)
 
 
 # Plot PC2 Strahler Slope
-pc1_stra <- slopes_df %>%
-  filter(PC == "PC2", Predictor == "Strahler") %>%
+pc2_stra <- slopes_df %>%
+  filter(PC == "PC2", Predictor == "Strahler_Order") %>%
   mutate(TimeRangeFactor = factor(TimeRangeFactor, levels = c("Night", "Morning","Day","Evening")))
 
-effectplot_strahler_PC2 <- ggplot(pc1_stra, aes(x = TimeRangeFactor, y = Strahler.trend)) +
+effectplot_strahler_PC2 <- ggplot(pc2_stra, aes(x = TimeRangeFactor, y = Strahler_Order.trend)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL), width = 0.2) +
@@ -1004,7 +751,7 @@ effectplot_strahler_PC2 <- ggplot(pc1_stra, aes(x = TimeRangeFactor, y = Strahle
     axis.text.x = element_blank(),    # remove x-axis labels
     axis.ticks.x = element_blank(),    # remove x-axis ticks
     axis.line.x = element_blank()     # remove x-axis line
-  ) + ylim (-0.6, 0.6)
+  ) + ylim (-0.6, 0.7)
 
 
 
@@ -1029,8 +776,6 @@ plotting_ds <- plotting_ds %>%
     )
   ) %>%
   filter(!is.na(Season))
-
-
 
 # For plotting - rename strahler to strahler order
 plotting_ds <- plotting_ds %>%
@@ -1102,13 +847,17 @@ diel_QBR_PC2_df <- summarise_diel(plotting_ds, "PC2", "QBR_Class")
 diel_Strahler_PC1_df <- summarise_diel(plotting_ds, "PC1", "Strahler_Order")
 diel_Strahler_PC2_df <- summarise_diel(plotting_ds, "PC2", "Strahler_Order")
 
+diel_site_PC2_df <- summarise_diel(plotting_ds, "PC2", "Site")
+
+
 # Make plotting break times
-# Combine all Time_bin columns to get the global min/max
+# Combine all Time_bin columns to get the final min/max
 all_times <- c(
   diel_QBR_PC1_df$Time_bin,
   diel_QBR_PC2_df$Time_bin,
   diel_Strahler_PC1_df$Time_bin,
-  diel_Strahler_PC2_df$Time_bin
+  diel_Strahler_PC2_df$Time_bin,
+  diel_site_PC2_df$Time_bin
 )
 
 # Make consistent break times at 04:00, 08:00, 12:00, etc.
@@ -1118,6 +867,8 @@ break_times <- seq(
   by   = "6 hours"                                              # 6-hour intervals
 )
 
+
+
 # Define palettes
 palettes <- list(
   QBR_Class = qbr_colors,
@@ -1126,8 +877,6 @@ palettes <- list(
 
 
 # Plotting:
-
-# --- Create four independent ggplots ---
 
 # PC1 QBR 
 p_QBR_PC1 <- ggplot(diel_QBR_PC1_df, aes(x = Time_bin, y = mean_val, color = QBR_Class)) +
@@ -1177,7 +926,7 @@ p_QBR_PC2 <- ggplot(diel_QBR_PC2_df, aes(x = Time_bin, y = mean_val, color = QBR
   scale_fill_manual(values = palettes$QBR_Class, guide = "none") +
   geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
   geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
-  ylim(-1, 2.3) +
+  ylim(1, -2.3) +
   labs(x = "Time" , y = "Compound Index 2", color = NULL, caption = "QBR Class") + 
   scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
   theme_classic() +
@@ -1196,7 +945,7 @@ p_Strahler_PC2 <- ggplot(diel_Strahler_PC2_df, aes(x = Time_bin, y = mean_val, c
   scale_fill_manual(values = palettes$Strahler_Order, guide = "none") +
   geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
   geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
-  ylim(-1, 2.3) +
+  ylim(1, -2.3) +
   labs(x = "Time" , y = NULL , color = NULL, caption = "Strahler Order") + 
   scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
   theme_classic() +
@@ -1233,8 +982,8 @@ effectplot_strahler_PC1
 effectplot_QBR_PC2
 effectplot_strahler_PC2
 
-# Grid PC1 with effect plots half the height of diel plots
-pc1_grid <- (model4_effect_PC1_QBR | model4_effect_PC1_Strahler) /  # Row 1
+# Grid PC1 with effect plots half the height of diel plots 
+pc1_grid <- (effectplot_QBR_PC1 | effectplot_strahler_PC1) /  # Row 1
   (p_QBR_PC1        | p_Strahler_PC1) +            # Row 2
   plot_layout(heights = c(1, 3))  # relative row heights: top row 1, bottom row 2 twice as tall
 
@@ -1243,7 +992,7 @@ pc1_grid
 
 
 # Grid PC2 with effect plots half the height of diel plots
-pc2_grid <- (model4_effect_PC2_QBR | model4_effect_PC2_Strahler) /  # Row 1
+pc2_grid <- (effectplot_QBR_PC2 | effectplot_strahler_PC2) /  # Row 1
   (p_QBR_PC2        | p_Strahler_PC2) +            # Row 2
   plot_layout(heights = c(1, 2))  # relative row heights: top row 1, bottom row 2 twice as tall
 
@@ -1274,6 +1023,7 @@ pc1_strah_grid
 
 # --- Reference date and Time Bins ---
 ref_date <- make_date(2000,1,1)
+
 time_bins <- tibble::tibble(
   label = c("Morning", "Day", "Evening", "Night"),
   start = c("04:00:01", "10:00:01", "16:00:01", "22:00:01"),
@@ -1349,7 +1099,7 @@ diel_QBR_PC2_monsoon       <- summarise_diel(plotting_ds, "PC2", "QBR_Class", "M
 diel_Strahler_PC2_monsoon  <- summarise_diel(plotting_ds, "PC2", "Strahler_Order", "Monsoon") %>%
   mutate(Strahler_Order = factor(Strahler_Order))
 
-
+diel_site_PC2_monsoon <- summarise_diel(plotting_ds, "PC2", "Site", "Monsoon")
 
 # PC1 Seasonal Plots:
 # Plot QBR PC1
@@ -1475,7 +1225,7 @@ p_QBR_PC2_dry <- ggplot(diel_QBR_PC2_dry, aes(x = Time_bin, y = mean_val, color 
   geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
   geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
   labs(x = NULL, y = "Compound Index 2") + 
-  ylim(-1.5, 3) +
+  ylim(1, -2.3) +
   scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
   theme_classic() +
   theme(legend.position = "none") 
@@ -1499,20 +1249,11 @@ p_QBR_PC2_monsoon <- ggplot(diel_QBR_PC2_monsoon, aes(x = Time_bin, y = mean_val
   geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
   geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
   labs(x = NULL, y = "Compound Index 2") + 
-  ylim(-1.5, 3) +
+  ylim(1, -2.3) +
   scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
   theme_classic() +
   theme(legend.position = "bottom", legend.direction = "horizontal") 
 
-  annotate("text",
-           x = min(diel_QBR_PC2_monsoon$Time_bin),
-           y = max(diel_QBR_PC2_monsoon$mean_val + diel_QBR_PC2_monsoon$ci_val),
-           label = "Monsoon",
-           hjust = 0.1, vjust = 10,
-           fontface = "bold",
-           size = 4)
-
-p_QBR_PC2_monsoon
 
 
 
@@ -1528,7 +1269,7 @@ p_Strahler_PC2_dry <- ggplot(diel_Strahler_PC2_dry, aes(x = Time_bin, y = mean_v
   geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
   geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
   labs(x = NULL, y = NULL) + 
-  ylim(-1.5, 3) +
+  ylim(1, -2.3) +
   scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
   theme_classic() +
   theme(legend.position = "none") 
@@ -1552,11 +1293,11 @@ p_Strahler_PC2_monsoon <- ggplot(diel_Strahler_PC2_monsoon, aes(x = Time_bin, y 
   geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
   geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
   labs(x = NULL, y = NULL) + 
-  ylim(-1.5, 3) +
+  ylim(1, -2.3) +
   scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
   theme_classic() +
   theme(legend.position = "bottom", legend.direction = "horizontal") 
-#+
+ #+
   annotate("text",
            x = min(diel_Strahler_PC2_monsoon$Time_bin),
            y = max(diel_Strahler_PC2_monsoon$mean_val + diel_Strahler_PC2_monsoon$ci_val),
@@ -1569,18 +1310,349 @@ p_Strahler_PC2_monsoon
 
 
 
+## Final Gridded 6 plot
 
-pc1_seasonal_strahler_grid <- ( p_QBR_PC2_dry | p_Strahler_PC2_dry) /  # Row 1
-  (p_QBR_PC2_monsoon | p_Strahler_PC2_monsoon) # Row 2
+# PC1 plots for final  --------------------------------
+library(mgcv) # GAM lol
+#GAM Function
+smooth_ribbon_gam <- function(df, value_col = "mean_val", ci_col = "ci_val", 
+                              group_col, time_col = "Time_bin") {
+  df %>%
+    mutate(
+      upper = .data[[value_col]] + .data[[ci_col]],
+      lower = .data[[value_col]] - .data[[ci_col]],
+      time_num = as.numeric(.data[[time_col]])
+    ) %>%
+    group_by(.data[[group_col]]) %>%
+    group_modify(~ {
+      n <- nrow(.x)
+      k <- min(15, max(4, floor(n / 3)))
+      
+      gam_mean  <- gam(mean_val ~ s(time_num, k = k), data = .x, method = "REML", gamma = 0.4)
+      gam_upper <- gam(upper    ~ s(time_num, k = k), data = .x, method = "REML", gamma = 0.4)
+      gam_lower <- gam(lower    ~ s(time_num, k = k), data = .x, method = "REML", gamma = 0.4)
+      
+      .x %>% mutate(
+        mean_smooth  = predict(gam_mean,  newdata = .x),
+        upper_smooth = predict(gam_upper, newdata = .x),
+        lower_smooth = predict(gam_lower, newdata = .x)
+      )
+    }) %>%
+    ungroup()
+}
 
-pc1_seasonal_strahler_grid
+# Apply to dataframes
+diel_QBR_PC1_df       <- smooth_ribbon_gam(diel_QBR_PC1_df,       group_col = "QBR_Class")
+diel_Strahler_PC1_df  <- smooth_ribbon_gam(diel_Strahler_PC1_df,  group_col = "Strahler_Order")
+diel_QBR_PC1_dry      <- smooth_ribbon_gam(diel_QBR_PC1_dry,      group_col = "QBR_Class")
+diel_QBR_PC1_monsoon  <- smooth_ribbon_gam(diel_QBR_PC1_monsoon,  group_col = "QBR_Class")
+diel_Strahler_PC1_dry <- smooth_ribbon_gam(diel_Strahler_PC1_dry, group_col = "Strahler_Order")
+diel_Strahler_PC1_monsoon <- smooth_ribbon_gam(diel_Strahler_PC1_monsoon, group_col = "Strahler_Order")
 
 
 
+# PC1 QBR - annual
+p_QBR_PC1 <- ggplot(diel_QBR_PC1_df, aes(x = Time_bin, y = mean_val, color = QBR_Class)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = QBR_Class),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = QBR_Class), linewidth = 1) +
+  scale_color_manual(values = palettes$QBR_Class) +
+  scale_fill_manual(values = palettes$QBR_Class, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = "Time", y = "Compound Index 1", caption = "Averaged Annual Variation", color = "QBR Class") + 
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() +
+  scale_y_reverse() + 
+  coord_cartesian(ylim = c(2, -5)) + 
+  theme(legend.position = "right", legend.direction = "vertical") 
+
+p_QBR_PC1
+
+# PC1 Strahller - annual
+diel_Strahler_PC1_df <- diel_Strahler_PC1_df %>%
+  mutate(Strahler_Order = factor(Strahler_Order))
+
+
+p_Strahler_PC1 <- ggplot(diel_Strahler_PC1_df, aes(x = Time_bin, y = mean_val, color = Strahler_Order)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = Strahler_Order),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = Strahler_Order), linewidth = 1) +
+  scale_color_manual(values = palettes$Strahler_Order) +
+  scale_fill_manual(values = palettes$Strahler_Order, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = "Time", y = "Compound Index 1", caption = "Averaged Annual Variation", color = "Stream Order") + 
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() +
+  scale_y_reverse() + 
+  coord_cartesian(ylim = c(2, -5)) + 
+  theme(legend.position = "right", legend.direction = "vertical") 
+
+
+# Seasonality
+
+p_QBR_PC1_dry <- ggplot(diel_QBR_PC1_dry, aes(x = Time_bin, y = mean_val, color = QBR_Class)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = QBR_Class),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = QBR_Class), linewidth = 1) +
+  scale_color_manual(values = palettes$QBR_Class) +
+  scale_fill_manual(values = palettes$QBR_Class, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = NULL, y = "Compound Index 1", caption = "Dry Season") + 
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal()  +
+  scale_y_reverse() +
+  coord_cartesian(ylim = c(2, -5)) + 
+  theme(legend.position = "none")
+
+p_QBR_PC1_dry
+
+p_QBR_PC1_monsoon <- ggplot(diel_QBR_PC1_monsoon, aes(x = Time_bin, y = mean_val, color = QBR_Class)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = QBR_Class),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = QBR_Class), linewidth = 1) +
+  scale_color_manual(values = palettes$QBR_Class) +
+  scale_fill_manual(values = palettes$QBR_Class, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = NULL, y = NULL, caption = "Monsoon Season") + 
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal()   +
+  scale_y_reverse() + 
+  coord_cartesian(ylim = c(2, -5)) + 
+  theme(legend.position = "none")
+
+
+p_QBR_PC1_monsoon
+
+# Plot Strahler PC1
+p_Strahler_PC1_dry <- ggplot(diel_Strahler_PC1_dry, aes(x = Time_bin, y = mean_val, color = Strahler_Order)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = Strahler_Order),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = Strahler_Order), linewidth = 1) +
+  scale_color_manual(values = palettes$Strahler_Order) +
+  scale_fill_manual(values = palettes$Strahler_Order, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = NULL, y = "Compound Index 1", caption = "Dry Season") + 
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal()  +
+  scale_y_reverse() +
+  coord_cartesian(ylim = c(2, -5)) + 
+  theme(legend.position = "none")
+
+p_Strahler_PC1_dry
+
+p_Strahler_PC1_monsoon <- ggplot(diel_Strahler_PC1_monsoon, aes(x = Time_bin, y = mean_val, color = Strahler_Order)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = Strahler_Order),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = Strahler_Order), linewidth = 1) +
+  scale_color_manual(values = palettes$Strahler_Order, name = "Strahler Order") +
+  scale_fill_manual(values = palettes$Strahler_Order, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = NULL, y = NULL, caption = "Dry Season") +
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal()   +
+  scale_y_reverse()+ 
+  coord_cartesian(ylim = c(2, -5)) + 
+  theme(legend.position = "none")
+
+
+p_Strahler_PC1_monsoon
 
 
 
+PC1_qbr_grid <- 
+  (
+    (p_QBR_PC1) /
+      (p_QBR_PC1_dry | p_QBR_PC1_monsoon)
+  ) +
+  plot_layout(guides = "collect")
+
+PC1_qbr_grid
+
+PC1_strahler_grid <- 
+  (
+    (p_Strahler_PC1) /
+      (p_Strahler_PC1_dry | p_Strahler_PC1_monsoon)
+  ) +
+  plot_layout(guides = "collect")
+
+
+PC1_strahler_grid
 
 
 
+# PC2 plots for finals ------------------------------------------
 
+# Apply to dataframes
+diel_QBR_PC2_df       <- smooth_ribbon_gam(diel_QBR_PC2_df,       group_col = "QBR_Class")
+diel_Strahler_PC2_df  <- smooth_ribbon_gam(diel_Strahler_PC2_df,  group_col = "Strahler_Order")
+diel_QBR_PC2_dry      <- smooth_ribbon_gam(diel_QBR_PC2_dry,      group_col = "QBR_Class")
+diel_QBR_PC2_monsoon  <- smooth_ribbon_gam(diel_QBR_PC2_monsoon,  group_col = "QBR_Class")
+diel_QBR_PC2_monsoon <- smooth_ribbon_gam(diel_QBR_PC2_monsoon,  group_col = "QBR_Class")
+diel_Strahler_PC2_dry <- smooth_ribbon_gam(diel_Strahler_PC2_dry, group_col = "Strahler_Order")
+diel_Strahler_PC2_monsoon <- smooth_ribbon_gam(diel_Strahler_PC2_monsoon, group_col = "Strahler_Order")
+
+diel_site_PC2_monsoon <- smooth_ribbon_gam(diel_site_PC2_monsoon, group_col = "Site")
+
+p_site_PC2 <- ggplot(diel_site_PC2_monsoon, aes(x = Time_bin, y = mean_val, color = Site))+
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = Site),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = Site), linewidth = 1) +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  ylim(1, -3) +
+  labs(x = NULL , y = "Compound Index 2") + 
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() 
+
+
+# PC2 QBR - annual
+p_QBR_PC2 <- ggplot(diel_QBR_PC2_df, aes(x = Time_bin, y = mean_val, color = QBR_Class))+
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = QBR_Class),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = QBR_Class), linewidth = 1) +
+  scale_color_manual(values = palettes$QBR_Class) +
+  scale_fill_manual(values = palettes$QBR_Class, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  ylim(1, -3) +
+  labs(x = "Time" , y = "Compound Index 2", color = "QBR Class", caption = "Averaged Annual Variation") + 
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() +
+  theme(legend.position = "right", legend.direction = "vertical") 
+
+# PC2 Strahler Annual
+diel_Strahler_PC2_df <- diel_Strahler_PC2_df %>%
+  mutate(Strahler_Order = factor(Strahler_Order))
+
+p_Strahler_PC2 <- ggplot(diel_Strahler_PC2_df, aes(x = Time_bin, y = mean_val, color = Strahler_Order))+
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = Strahler_Order),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = Strahler_Order), linewidth = 1) +
+  scale_color_manual(values = palettes$Strahler_Order) +
+  scale_fill_manual(values = palettes$Strahler_Order, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  ylim(1, -2.6) +
+  labs(x = "Time" , y = "Compound Index 2", caption = "Averaged Annual Variation", color = "Stream Order") + 
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() +
+  theme(legend.position = "right", legend.direction = "vertical") 
+
+
+p_Strahler_PC2
+
+
+# Seasonal Plots
+
+
+# Plot QBR PC2 Dry
+p_QBR_PC2_dry <- ggplot(diel_QBR_PC2_dry, aes(x = Time_bin, y = mean_val, color = QBR_Class)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = QBR_Class),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = QBR_Class), linewidth = 1) +
+  scale_color_manual(values = palettes$QBR_Class) +
+  scale_fill_manual(values = palettes$QBR_Class, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = NULL, y = "Compound Index 2", caption = "Dry Season") + 
+  ylim(1, -3) +
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+
+
+p_QBR_PC2_dry
+
+# Plot QBR PC2 Monsoon
+p_QBR_PC2_monsoon <- ggplot(diel_QBR_PC2_monsoon, aes(x = Time_bin, y = mean_val, color = QBR_Class)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = QBR_Class),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = QBR_Class), linewidth = 1) +
+  scale_color_manual(values = palettes$QBR_Class, name = "QBR Order") +
+  scale_fill_manual(values = palettes$QBR_Class, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = NULL, y = NULL, caption = "Monsoon Season") + 
+  ylim(1, -3) +
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+
+
+p_QBR_PC2_monsoon
+
+diel_QBR_PC2_monsoon %>%
+  group_by(QBR_Class) %>%
+  summarise(
+    n = n(),
+    n_distinct_times = n_distinct(Time_bin),
+    has_dupes = n() != n_distinct(Time_bin)
+  )
+
+# Plot Strahler PC2 Dry
+p_Strahler_PC2_dry <- ggplot(diel_Strahler_PC2_dry, aes(x = Time_bin, y = mean_val, color = Strahler_Order)) +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = Strahler_Order),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = Strahler_Order), linewidth = 1) +
+  scale_color_manual(values = palettes$Strahler_Order) +
+  scale_fill_manual(values = palettes$Strahler_Order, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = NULL, y = "Compound Index 2", caption = "Dry Season") + 
+  ylim(1, -3) +
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+
+
+p_Strahler_PC2_dry
+
+
+# Plot Strahler PC2 Monsoon
+p_Strahler_PC2_monsoon <- ggplot(diel_Strahler_PC2_monsoon, aes(x = Time_bin, y = mean_val, color = Strahler_Order))  +
+  geom_ribbon(aes(ymin = lower_smooth, ymax = upper_smooth, fill = Strahler_Order),
+              alpha = 0.3, colour = NA) +
+  geom_line(aes(y = mean_smooth, group = Strahler_Order), linewidth = 1) +
+  scale_color_manual(values = palettes$Strahler_Order, name = "Strahler Order") +
+  scale_fill_manual(values = palettes$Strahler_Order, guide = "none") +
+  geom_vline(xintercept = as.numeric(time_bins$start_POSIX), linetype = "dotted") +
+  geom_vline(xintercept = as.numeric(time_bins$end_POSIX), linetype = "dotted") +
+  labs(x = NULL, y = NULL, caption = "Monsoon Season") + 
+  ylim(1, -3) +
+  scale_x_datetime(date_labels = "%H:%M", breaks = break_times) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+
+p_Strahler_PC2_monsoon
+
+
+
+diel_Strahler_PC2_monsoon %>% 
+  count(Strahler_Order)
+
+# Plotting final plot 
+
+pc2_qbr_grid <- 
+  (
+    (p_QBR_PC2) /
+      (p_QBR_PC2_dry | p_QBR_PC2_monsoon)
+  ) +
+  plot_layout(guides = "collect")
+
+pc2_qbr_grid
+
+pc2_strahler_grid <- 
+  (
+    (p_Strahler_PC2) /
+      (p_Strahler_PC2_dry | p_Strahler_PC2_monsoon)
+  ) +
+  plot_layout(guides = "collect")
+
+
+pc2_strahler_grid

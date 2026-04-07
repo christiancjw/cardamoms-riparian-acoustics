@@ -95,8 +95,12 @@ raw_audio_files2025 <- "/Volumes/C Media SSD/2025 Acoustics/"
 "CI10" # Once April starts, heavy interference
 "CC01" 
 
+
+
+
 # List the time periods rain found in false colour long duration spectrograms
 tachey_rain_periods <- list(
+  "20231117" = list(c("00:00:00", "08:25:00")),
   "20240404" = list(c("14:45:00", "17:25:00")),
   "20240407" = list(c("16:45:00", "17:40:00")),
   "20240610" = list(c("06:25:00", "09:40:00")),
