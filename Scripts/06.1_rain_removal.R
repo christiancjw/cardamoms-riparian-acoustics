@@ -73,7 +73,7 @@ write.csv(global_data_clean, "clean_data/datasets/indices_datasets/global2325RL_
 songmeters25_data_clean <- songmeters25_data %>%
   anti_join(fullinterference_trimmed, by = c("Site", "Device", "Date", "FileName"))
 
-write.csv(global_data_clean, "clean_data/datasets/indices_datasets/songmeters25RL_data.csv", row.names = FALSE)
+write.csv(songmeters25_data_clean, "clean_data/datasets/indices_datasets/songmeters25RL_data.csv", row.names = FALSE)
 
 # Cardamoms 
 # Global SingleDevice Dataset

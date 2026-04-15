@@ -95,8 +95,8 @@ if(length(meta_sd) > 0) {
 
 # Variance text labels
 str_pve <- summary(structured_pca$pca)$importance[2,]
-str_pc1 <- paste0("PC1 (", round(str_pve[1]*100, 1), "%)")
-str_pc2 <- paste0("PC2 (", round(str_pve[2]*100, 1), "%)")
+str_pc1 <- paste0("Compound Index 1 (", round(str_pve[1]*100, 1), "%)")
+str_pc2 <- paste0("Compound Index 2 (", round(str_pve[2]*100, 1), "%)")
 
 str_arrow_scale <- 9
 
@@ -136,8 +136,8 @@ meta_rlds <- meta_cols[meta_cols %in% colnames(rl_structured_ds)]
 if(length(meta_rlds) > 0) rlds_scores_df <- cbind(rlds_scores_df, rl_structured_ds[, meta_rlds, drop = FALSE])
 
 rlds_pve <- summary(rl_structured_pca$pca)$importance[2,]
-rlds_pc1 <- paste0("PC1 (", round(rlds_pve[1]*100, 1), "%)")
-rlds_pc2 <- paste0("PC2 (", round(rlds_pve[2]*100, 1), "%)")
+rlds_pc1 <- paste0("Compound Index 1 (", round(rlds_pve[1]*100, 1), "%)")
+rlds_pc2 <- paste0("Compound Index 2 (", round(rlds_pve[2]*100, 1), "%)")
 
 rlds_arrow_scale <- 9
 plot_rl_structured_arrows <- ggplot() +
@@ -175,8 +175,8 @@ meta_gl <- meta_cols[meta_cols %in% colnames(global_ds)]
 if(length(meta_gl) > 0) gl_scores_df <- cbind(gl_scores_df, global_ds[, meta_gl, drop = FALSE])
 
 gl_pve <- summary(global_pca$pca)$importance[2,]
-gl_pc1 <- paste0("PC1 (", round(gl_pve[1]*100, 1), "%)")
-gl_pc2 <- paste0("PC2 (", round(gl_pve[2]*100, 1), "%)")
+gl_pc1 <- paste0("Compound Index 1 (", round(gl_pve[1]*100, 1), "%)")
+gl_pc2 <- paste0("Compound Index 2 (", round(gl_pve[2]*100, 1), "%)")
 
 gl_arrow_scale <- 9
 plot_global_arrows <- ggplot() +
@@ -212,8 +212,8 @@ meta_rlg <- meta_cols[meta_cols %in% colnames(rl_global_ds)]
 if(length(meta_rlg) > 0) rlg_scores_df <- cbind(rlg_scores_df, rl_global_ds[, meta_rlg, drop = FALSE])
 
 rlg_pve <- summary(rl_global_pca$pca)$importance[2,]
-rlg_pc1 <- paste0("PC1 (", round(rlg_pve[1]*100, 1), "%)")
-rlg_pc2 <- paste0("PC2 (", round(rlg_pve[2]*100, 1), "%)")
+rlg_pc1 <- paste0("Compound Index 1 (", round(rlg_pve[1]*100, 1), "%)")
+rlg_pc2 <- paste0("Compound Index 2 (", round(rlg_pve[2]*100, 1), "%)")
 
 rlg_arrow_scale <- 9
 
@@ -258,7 +258,7 @@ arrow_plot_grid <- plot_grid(
 )
 # column titles
 col_titles <- plot_grid(
-  ggdraw() + draw_label("Structured", size = 14),
+  ggdraw() + draw_label("Primary", size = 14),
   ggdraw() + draw_label("Global",     size = 14),
   ncol = 2
 )
@@ -284,7 +284,7 @@ final_arrow_plot <- plot_grid(
 
 final_arrow_plot
 
-
+ggsave()
 
 ###############################################################################
 # ======================= 5) PCA HEATMAPS ====================================

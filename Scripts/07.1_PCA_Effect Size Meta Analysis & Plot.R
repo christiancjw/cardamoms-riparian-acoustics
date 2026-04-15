@@ -301,14 +301,15 @@ var_explained <- function(pca, name) {
 
 
 bind_rows(
-  var_explained(single_pca, "Raw Single"),
+  var_explained(single_pca, "Raw Primary"),
   var_explained(global_pca, "Raw Global"),
-  var_explained(rl_single_pca, "Rainless Single"),
+  var_explained(rl_single_pca, "Filtered Primary"),
   var_explained(rl_global_pca, "Rainless Global")
 ) %>%
   ggplot(aes(PC, Var, group = Dataset, linetype = Dataset)) +
   geom_line() +
   geom_point() +
+  labs(x = "Compound Indices (PCs)", y = "Variance Explained") + 
   theme_minimal()
 
 ### Fixed - PCA Procrustes ---------------------------------
@@ -389,3 +390,4 @@ res_table <- res %>%
   pivot_wider(names_from = Col, values_from = Cell)
 
 res_table
+

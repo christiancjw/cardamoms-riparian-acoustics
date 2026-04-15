@@ -190,7 +190,7 @@ ggplot(final_ds, aes(factor(Strahler_Order), PC1, fill = factor(Strahler_Order))
 
 # Ensure Strahler is a factor for grouping
 final_ds <- final_ds %>%
-  mutate(Strahler_f = factor(Strahler))
+  mutate(Strahler_f = factor(Strahler_Order))
 
 #
 ggplot(final_ds,
@@ -261,6 +261,7 @@ ggplot(final_ds,
   coord_cartesian(xlim = c(-8, 4),
                   ylim = c(-10, 6)) +
   scale_color_manual(values = qbr_colors) +
+  ylim(-7, 6) +
   theme_minimal() +
   labs(
     x = "Compound Index 1 (37.9% Variance)",
