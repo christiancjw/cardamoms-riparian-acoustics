@@ -93,7 +93,7 @@ fit_model4_and_extract_ci <- function(dat, response_var) {
     paste0(response_var,
            " ~ QBR_bin * TimeRangeFactor + ",
            "Strahler * TimeRangeFactor + ",
-           "(1 | Site) + (1 | Season)")
+           "Season + (1 | Site)")
   )
   model <- lmer(formula_obj, data = dat, REML = TRUE)
   ci    <- confint(model, method = "Wald")
@@ -113,7 +113,7 @@ fit_model4_and_extract_fp <- function(dat, response_var) {
     paste0(response_var,
            " ~ QBR_bin * TimeRangeFactor + ",
            "Strahler * TimeRangeFactor + ",
-           "(1 | Site) + (1 | Season)")
+           "Season + (1 | Site)")
   )
   # lmerTest::lmer adds Satterthwaite F and p-values to the ANOVA table
   model <- lmerTest::lmer(formula_obj, data = dat, REML = TRUE)
@@ -130,7 +130,6 @@ fit_model4_and_extract_fp <- function(dat, response_var) {
 }
 
 # Run Iterations (CIs)--------------------------------------------------------------
-()
 set.seed(123)
 n_runs <- 200
 pcs    <- c("PC1", "PC2")

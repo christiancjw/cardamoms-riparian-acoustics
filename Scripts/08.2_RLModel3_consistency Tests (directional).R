@@ -92,7 +92,7 @@ fit_RLmodel3_and_extract_ci <- function(dat, response_var) {
   formula_obj <- as.formula(
     paste0(response_var,
            " ~ QBR_bin + Strahler + ",
-           "(1 | Site) + (1 | Season)")
+           "Season + (1 | Site)")
   )
   model <- lmer(formula_obj, data = dat, REML = TRUE)
   ci    <- confint(model, method = "Wald")
@@ -111,7 +111,7 @@ fit_RLmodel3_and_extract_fp <- function(dat, response_var) {
   formula_obj <- as.formula(
     paste0(response_var,
            " ~ QBR_bin + Strahler + ",
-           "(1 | Site) + (1 | Season)")
+           "Season + (1 | Site)")
   )
   model     <- lmerTest::lmer(formula_obj, data = dat, REML = TRUE)
   aov_table <- anova(model, type = 3)
@@ -129,7 +129,7 @@ fit_RLmodel3_and_extract_fp <- function(dat, response_var) {
 # Run Iterations CIs --------------------------------------------------------------
 
 set.seed(123)
-n_runs <- 100
+n_runs <- 200
 pcs    <- c("PC1", "PC2")
 
 all_model3_CI_results <- map_dfr(pcs, function(pc) {
@@ -146,7 +146,7 @@ saveRDS(all_model3_CI_results,
         "clean_data/datasets/modelconsistency/RLmodel3_CI_results_allPCs.rds")
 
 write.csv(all_model3_CI_results,
-          "clean_data/datasets/modelconsistency/RLmodel3_CI_results_allPCs.rds")
+          "clean_data/datasets/modelconsistency/RLmodel3_CI_results_allPCs.csv")
 
 
 
@@ -211,6 +211,7 @@ stability_df <- stability_df %>%
     term == "(Intercept)" ~ "Intercept",
     term == "QBR_bin"     ~ "QBR",
     term == "Strahler"    ~ "Strahler",
+    term == "Season"      ~ "Season",
     TRUE ~ NA_character_
   )) %>%
   filter(!is.na(term_clean))
@@ -412,3 +413,4 @@ p_model3_fp <- ggplot(plot_df,
   )
 
 p_model3_fp
+
