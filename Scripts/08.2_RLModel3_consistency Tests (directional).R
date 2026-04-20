@@ -5,7 +5,7 @@ library(tidyr)
 library(ggplot2)
 library(stringr)
 library(lmerTest) 
-
+library(MuMIn)
 
 # Setup -----------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ fit_RLmodel3_and_extract_ci <- function(dat, response_var) {
   formula_obj <- as.formula(
     paste0(response_var,
            " ~ QBR_bin + Strahler + ",
-           "Season + (1 | Site)")
+           "Season + TimeRangeFactor + (1 | Site)")
   )
   model <- lmer(formula_obj, data = dat, REML = TRUE)
   ci    <- confint(model, method = "Wald")
@@ -111,7 +111,7 @@ fit_RLmodel3_and_extract_fp <- function(dat, response_var) {
   formula_obj <- as.formula(
     paste0(response_var,
            " ~ QBR_bin + Strahler + ",
-           "Season + (1 | Site)")
+           "Season + TimeRangeFactor + (1 | Site)")
   )
   model     <- lmerTest::lmer(formula_obj, data = dat, REML = TRUE)
   aov_table <- anova(model, type = 3)
@@ -122,6 +122,24 @@ fit_RLmodel3_and_extract_fp <- function(dat, response_var) {
     p_value = aov_table[["Pr(>F)"]],
     df_num  = aov_table[["NumDF"]],
     df_den  = aov_table[["DenDF"]]
+  )
+}
+
+
+# Extract R2 Values
+fit_RLmodel3_r2 <- function(dat, response_var) {
+  formula_obj <- as.formula(
+    paste0(response_var,
+           " ~ QBR_bin + Strahler + ",
+           "Season + TimeRangeFactor +  (1 | Site)")
+  )
+  
+  model <- lmer(formula_obj, data = dat, REML = TRUE)
+  r2_vals <- MuMIn::r.squaredGLMM(model)
+  
+  tibble(
+    R2_marginal    = r2_vals[1],
+    R2_conditional = r2_vals[2]
   )
 }
 
@@ -137,6 +155,7 @@ all_model3_CI_results <- map_dfr(pcs, function(pc) {
   map_dfr(1:n_runs, function(i) {
     message("  Iteration ", i)
     sampled_data <- sample_one_device_per_site_deployment(m3_ds)
+    
     fit_RLmodel3_and_extract_ci(sampled_data, pc) %>%
       mutate(iteration = i, PC = pc)
   })
@@ -148,25 +167,46 @@ saveRDS(all_model3_CI_results,
 write.csv(all_model3_CI_results,
           "clean_data/datasets/modelconsistency/RLmodel3_CI_results_allPCs.csv")
 
+# Run R2
+all_model3_r2_results <- map_dfr(pcs, function(pc) {
+  message("Running iterations for ", pc)
+  map_dfr(1:n_runs, function(i) {
+    message("  Iteration ", i)
+    sampled_data <- sample_one_device_per_site_deployment(m3_ds)
+    
+    fit_RLmodel3_r2(sampled_data, pc) %>%
+      mutate(iteration = i, PC = pc)
+  })
+})
+# Look at R2
+model3_r2_summary <- all_model3_r2_results %>%
+  group_by(PC) %>%
+  summarise(
+    mean_R2_marginal = mean(R2_marginal),
+    sd_R2_marginal   = sd(R2_marginal),
+    mean_R2_cond     = mean(R2_conditional),
+    sd_R2_cond       = sd(R2_conditional)
+  )
 
+model3_r2_summary
 
 # CI Evaluation ------------------------------------------------------------------
 
-resultsall <- readRDS("clean_data/datasets/modelconsistency/RLmodel3_results_allPCs.rds")
+model3_resultsall <- readRDS("clean_data/datasets/modelconsistency/RLmodel3_CI_results_allPCs.rds")
 
-resultsall <- resultsall %>%
+model3_resultsall <- model3_resultsall %>%
   mutate(
     significant = ifelse(lower > 0 | upper < 0, 1, 0),
     sign        = sign(estimate)
   )
 
-message("Overall proportion significant: ", round(mean(resultsall$significant), 3))
+message("Overall proportion significant: ", round(mean(model3_resultsall$significant), 3))
 message("Sign distribution:")
-print(table(resultsall$sign))
+print(table(model3_resultsall$sign))
 
 # CI Stability: significance + direction -----------------------------------------
 
-stability_df <- resultsall %>%
+model3_stability_df <- model3_resultsall %>%
   group_by(term, PC) %>%
   summarise(
     prop_significant      = mean(significant),
@@ -202,33 +242,34 @@ stability_df <- resultsall %>%
   )
 
 message("\nStability classification summary:")
-print(table(stability_df$stability_class, stability_df$PC))
+print(table(model3_stability_df$stability_class, model3_stability_df$PC))
 
 # CI Clean term labels -----------------------------------------------------------
 
-stability_df <- stability_df %>%
+model3_stability_df <- model3_stability_df %>%
   mutate(term_clean = case_when(
     term == "(Intercept)" ~ "Intercept",
-    term == "QBR_bin"     ~ "QBR",
-    term == "Strahler"    ~ "Strahler",
-    term == "Season"      ~ "Season",
+    term == "QBR_bin"     ~ "QBR Class",
+    term == "Strahler"    ~ "Stream Order",
+    term == "SeasonMonsoon" ~ "Monsoon Shift",
     TRUE ~ NA_character_
   )) %>%
   filter(!is.na(term_clean))
 
 # CI Plot prep -------------------------------------------------------------------
 
-y_order <- c("Intercept", "QBR", "Strahler")
+y_order <- c("Intercept", "Monsoon Shift", "QBR Class", "Stream Order")
 
-plot_df <- stability_df %>%
+model3_plot_df <- model3_stability_df %>%
   mutate(
     term_clean = factor(term_clean, levels = rev(y_order)),
     group = case_when(
       term_clean == "Intercept" ~ "Intercept",
-      term_clean == "QBR"       ~ "QBR",
-      term_clean == "Strahler"  ~ "Strahler"
+      term_clean == "QBR Class"       ~ "QBR Class",
+      term_clean == "Stream Order"  ~ "Stream Order",
+      term_clean == "Season"    ~ "Monsoon Shift"
     ),
-    group = factor(group, levels = c("Intercept", "QBR", "Strahler")),
+    group = factor(group, levels = c("Intercept", "Season", "QBR", "Strahler")),
     sig_label = case_when(
       prop_significant >= 0.90 ~ paste0(sprintf("%.2f", prop_significant), "*"),
       TRUE                     ~ sprintf("%.2f", prop_significant)
@@ -243,7 +284,7 @@ plot_df <- stability_df %>%
 
 # CI Plot ------------------
 
-p_combined <- ggplot(plot_df,
+p_combined <- ggplot(model3_plot_df,
                      aes(x = PC, y = term_clean, fill = fully_stable)) +
   geom_tile(color = "white", linewidth = 0.5) +
   geom_text(aes(label = combined_label,
@@ -311,7 +352,7 @@ write.csv(all_model3_fp_results,
 # Plotting ----------------------
 all_model3_fp_results <- read.csv("clean_data/datasets/modelconsistency/RLmodel3_fp_results_allPCs.csv")
 
-
+# Summarise your fp results first
 model3_fp <- all_model3_fp_results %>%
   group_by(PC, term) %>%
   summarise(
@@ -323,24 +364,11 @@ model3_fp <- all_model3_fp_results %>%
   ) %>%
   arrange(PC, term)
 
-
-
-
-# Summarise your fp results first
-model3_summary <- all_model3_fp_results %>%
-  group_by(PC, term) %>%
-  summarise(
-    median_F  = median(F_value, na.rm = TRUE),
-    prop_p05  = mean(p_value < 0.05, na.rm = TRUE),
-    median_p  = median(p_value, na.rm = TRUE),
-    .groups   = "drop"
-  )
-
 # Clean term labels
 term_labels <- c(
+  "Intercept"                       = "Intercept",
   "QBR_bin"                          = "QBR",
   "Strahler"                         = "Strahler",
-  "TimeRangeFactorw"                  = "Time of Day",
   "Season"                           = "Season",
   "QBR_bin:TimeRangeFactor"          = "QBR × Time",
   "QBR_bin:Season"                   = "QBR × Season",
@@ -365,7 +393,7 @@ term_groups <- tibble(
 # Build plot_df
 model3_summary
 
-plot_df <- model3_summary %>%
+model3_fp_plot_df <- model3_fp %>%
   left_join(term_groups, by = "term") %>%
   filter(!is.na(term_clean)) %>%
   mutate(
@@ -378,7 +406,7 @@ plot_df <- model3_summary %>%
     PC_label    = paste0(PC)
   )
 
-plot_df
+model3_fp_plot_df
 
 
 # Plot

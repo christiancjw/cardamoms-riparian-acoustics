@@ -96,6 +96,8 @@ fit_model4_and_extract_ci <- function(dat, response_var) {
            "Season + (1 | Site)")
   )
   model <- lmer(formula_obj, data = dat, REML = TRUE)
+  
+  r2_vals <- MuMIn::r.squaredGLMM(model)
   ci    <- confint(model, method = "Wald")
   ci    <- ci[rownames(ci) %in% names(fixef(model)), ]
   
@@ -129,6 +131,24 @@ fit_model4_and_extract_fp <- function(dat, response_var) {
   )
 }
 
+# Extract R2 Values
+fit_RLmodel4_r2 <- function(dat, response_var) {
+  formula_obj <- as.formula(
+    paste0(response_var,
+           " ~ QBR_bin * TimeRangeFactor + ",
+           "Strahler * TimeRangeFactor + ",
+           "Season + (1 | Site)")
+  )
+  
+  model <- lmer(formula_obj, data = dat, REML = TRUE)
+  r2_vals <- MuMIn::r.squaredGLMM(model)
+  
+  tibble(
+    R2_marginal    = r2_vals[1],
+    R2_conditional = r2_vals[2]
+  )
+}
+
 # Run Iterations (CIs)--------------------------------------------------------------
 set.seed(123)
 n_runs <- 200
@@ -147,25 +167,46 @@ all_model4_results <- map_dfr(pcs, function(pc) {
 saveRDS(all_model4_results,
         "clean_data/datasets/modelconsistency/RLnew2model4_results_allPCs.rds")
 
+# Run R2
+all_model4_r2_results <- map_dfr(pcs, function(pc) {
+  message("Running iterations for ", pc)
+  map_dfr(1:n_runs, function(i) {
+    message("  Iteration ", i)
+    sampled_data <- sample_one_device_per_site_deployment(m3_ds)
+    
+    fit_RLmodel4_r2(sampled_data, pc) %>%
+      mutate(iteration = i, PC = pc)
+  })
+})
+# Look at R2
+model4_r2_summary <- all_model4_r2_results %>%
+  group_by(PC) %>%
+  summarise(
+    mean_R2_marginal = mean(R2_marginal),
+    sd_R2_marginal   = sd(R2_marginal),
+    mean_R2_cond     = mean(R2_conditional),
+    sd_R2_cond       = sd(R2_conditional)
+  )
 
+model4_r2_summary
 
 # CIs Evaluation ------------------------------------------------------------------
 
-resultsall <- readRDS("clean_data/datasets/modelconsistency/RLnew2model4_results_allPCs.rds")
+model4_resultsall <- readRDS("clean_data/datasets/modelconsistency/RLnew2model4_results_allPCs.rds")
 
-resultsall <- resultsall %>%
+model4_resultsall <- model4_resultsall %>%
   mutate(
     significant = ifelse(lower > 0 | upper < 0, 1, 0),
     sign        = sign(estimate)
   )
 
-message("Overall proportion significant: ", round(mean(resultsall$significant), 3))
+message("Overall proportion significant: ", round(mean(model4_resultsall$significant), 3))
 message("Sign distribution:")
-print(table(resultsall$sign))
+print(table(model4_resultsall$sign))
 
 # CI Stability: significance + direction -----------------------------------------
 
-stability_df <- resultsall %>%
+model4_stability_df <- model4_resultsall %>%
   group_by(term, PC) %>%
   summarise(
     # Significance stability
@@ -209,12 +250,12 @@ stability_df <- resultsall %>%
   )
 
 message("\nStability classification summary:")
-print(table(stability_df$stability_class, stability_df$PC))
+print(table(model4_stability_df$stability_class, model4_stability_df$PC))
 
 # CI Clean term labels -----------------------------------------------------------
 # Model 4 has no Season fixed effects — simpler label set than Model 5
 
-stability_df <- stability_df %>%
+model4_stability_df <- model4_stability_df %>%
   mutate(term_clean = case_when(
     term == "(Intercept)"                        ~ "Time:Morning",
     term == "TimeRangeFactorDay"                 ~ "Time:Day",
@@ -228,6 +269,7 @@ stability_df <- stability_df %>%
     term == "TimeRangeFactorDay:Strahler"        ~ "Strahler:Day",
     term == "TimeRangeFactorEvening:Strahler"    ~ "Strahler:Evening",
     term == "TimeRangeFactorNight:Strahler"      ~ "Strahler:Night",
+    term == "Season"                             ~ "Season",
     TRUE ~ NA_character_
   )) %>%
   filter(!is.na(term_clean))
@@ -240,7 +282,7 @@ y_order <- c(
   "Strahler:Morning", "Strahler:Day", "Strahler:Evening", "Strahler:Night"
 )
 
-plot_df <- stability_df %>%
+model4_plot_df <- model4_stability_df %>%
   mutate(
     term_clean = factor(term_clean, levels = rev(y_order)),
     
@@ -272,7 +314,7 @@ plot_df <- stability_df %>%
 # CI Plot Combined ------------------------------------------------------------
 
 
-p_model4_combined <- ggplot(plot_df,
+p_model4_combined <- ggplot(model4_plot_df,
                      aes(x = PC, y = term_clean, fill = fully_stable)) +
   geom_tile(color = "white", linewidth = 0.5) +
   geom_text(aes(label = combined_label,
@@ -316,14 +358,14 @@ ggsave("modelsconsistency.png", model_consistencies,
        width = 10, height = 6, units = "in", dpi = 300)
 # CI Export stability table ------------------------------------------------------
 
-stability_export <- stability_df %>%
+model4_stability_export <- model4_stability_df %>%
   select(PC, term_clean, prop_significant, dominant_direction,
          direction_consistency, prop_sig_positive, prop_sig_negative,
          fully_stable, stability_class, mean_estimate, sd_estimate,
          mean_lower, mean_upper) %>%
   arrange(PC, term_clean)
 
-write.csv(stability_export,
+write.csv(model4_stability_export,
           "clean_data/datasets/modelconsistency/RLmodel4_stability_summary.csv",
           row.names = FALSE)
 
