@@ -269,7 +269,7 @@ model4_stability_df <- model4_stability_df %>%
     term == "TimeRangeFactorDay:Strahler"        ~ "Strahler:Day",
     term == "TimeRangeFactorEvening:Strahler"    ~ "Strahler:Evening",
     term == "TimeRangeFactorNight:Strahler"      ~ "Strahler:Night",
-    term == "Season"                             ~ "Season",
+    term == "SeasonMonsoon"                             ~ "Monsoon Shift",
     TRUE ~ NA_character_
   )) %>%
   filter(!is.na(term_clean))

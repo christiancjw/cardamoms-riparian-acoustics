@@ -406,12 +406,15 @@ QBR_Dry_Time
 QBR_Monsoon_Time
 
 # Model 3 -----------
-model3_pc1 <- lmer(PC1 ~ QBR_bin  +
-                         Strahler_Order  +
-                         Season + 
-                         (1 | Site) , 
-                         data = final_ds)
 
+model3_pc1 <- lmer(PC1 ~ QBR_bin  +
+                     Strahler_Order  +
+                     Season + 
+                    TimeRangeFactor + 
+                     (1 | Site) , 
+                   data = final_ds)
+
+anova(model3a_pc1, model3b_pc1)
 
 anova(model3_pc1)
 
@@ -620,6 +623,8 @@ extract_model_terms_boot_all <- function(model, model_name, nboot = 1000){
 
 # Run all models ---
 model_terms_boot_all <- bind_rows(
+  extract_model_terms_boot_all(model3_pc1, "Model3_PC1"),
+  extract_model_terms_boot_all(model3_pc2, "Model3_PC2"),
   extract_model_terms_boot_all(model4_PC1, "Model4_PC1"),
   extract_model_terms_boot_all(model4_PC2, "Model4_PC2"),
   extract_model_terms_boot_all(model5_PC1, "Model5_PC1"),
@@ -638,6 +643,70 @@ model_terms_boot_all <- bind_rows(
 
 write.csv(model_terms_boot_all, "mixed_model3_coefficients_boot_all.csv")
 
+
+# Mixed Models Stats (CI + ANOVAs)------------
+extract_model_terms_boot_all <- function(model, model_name, nboot = 1000){
+  
+  # --- Fixed effects ---
+  tidy_fixed <- broom.mixed::tidy(model, effects = "fixed") %>%
+    dplyr::select(term, estimate, std.error, statistic)
+  
+  # --- Random effects ---
+  tidy_random <- broom.mixed::tidy(model, effects = "ran_pars") %>%
+    dplyr::select(term, estimate) %>%
+    dplyr::mutate(std.error = NA, statistic = NA)
+  
+  # Combine fixed + random
+  all_terms <- dplyr::bind_rows(
+    tidy_fixed %>% dplyr::mutate(effect_type = "fixed"),
+    tidy_random %>% dplyr::mutate(effect_type = "random")
+  )
+  
+  # --- Bootstrap CIs ---
+  boot_ci <- confint(model, method = "boot", nsim = nboot)
+  
+  boot_df <- as.data.frame(boot_ci)
+  boot_df$term <- rownames(boot_df)
+  rownames(boot_df) <- NULL
+  names(boot_df)[1:2] <- c("conf.low", "conf.high")
+  
+  all_terms <- all_terms %>%
+    dplyr::left_join(boot_df, by = "term") %>%
+    dplyr::mutate(model = model_name)
+  
+  # --- ANOVA table ---
+  anova_df <- as.data.frame(anova(model)) %>%
+    tibble::rownames_to_column("term") %>%
+    dplyr::mutate(model = model_name)
+  
+  # --- return BOTH ---
+  list(
+    coefficients = all_terms,
+    anova = anova_df
+  )
+}
+
+model_terms_boot_all <- bind_rows(
+  extract_model_terms_boot_all(model3_pc1, "Model3_PC1")$coefficients,
+  extract_model_terms_boot_all(model3_pc2, "Model3_PC2")$coefficients,
+  extract_model_terms_boot_all(model4_PC1, "Model4_PC1")$coefficients,
+  extract_model_terms_boot_all(model4_PC2, "Model4_PC2")$coefficients,
+  extract_model_terms_boot_all(model5_PC1, "Model5_PC1")$coefficients,
+  extract_model_terms_boot_all(model5_PC2, "Model5_PC2")$coefficients
+)
+
+
+anova_all <- bind_rows(
+  extract_model_terms_boot_all(model3_pc1, "Model3_PC1")$anova,
+  extract_model_terms_boot_all(model3_pc2, "Model3_PC2")$anova,
+  extract_model_terms_boot_all(model4_PC1, "Model4_PC1")$anova,
+  extract_model_terms_boot_all(model4_PC2, "Model4_PC2")$anova,
+  extract_model_terms_boot_all(model5_PC1, "Model5_PC1")$anova,
+  extract_model_terms_boot_all(model5_PC2, "Model5_PC2")$anova
+)
+
+write.csv(model_terms_boot_all, "mixed_model_coefficients_boot_all.csv", row.names = FALSE)
+write.csv(anova_all, "mixed_model_anova_all.csv", row.names = FALSE)
 
 # Model 4 Diel Plot  -------------------------------
 # Load data

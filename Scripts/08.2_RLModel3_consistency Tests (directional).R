@@ -164,8 +164,6 @@ all_model3_CI_results <- map_dfr(pcs, function(pc) {
 saveRDS(all_model3_CI_results,
         "clean_data/datasets/modelconsistency/RLmodel3_CI_results_allPCs.rds")
 
-write.csv(all_model3_CI_results,
-          "clean_data/datasets/modelconsistency/RLmodel3_CI_results_allPCs.csv")
 
 # Run R2
 all_model3_r2_results <- map_dfr(pcs, function(pc) {
@@ -331,7 +329,7 @@ message("  RLmodel3_direction_stability.png")
 message("  RLmodel3_combined_stability.png")
 message("  RLmodel3_stability_summary.csv")
 
-# P and F Values ---------------------
+# Anova based P and F Values ---------------------
 set.seed(123)
 n_runs <- 200
 pcs    <- c("PC1", "PC2")
