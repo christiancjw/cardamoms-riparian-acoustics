@@ -9,7 +9,6 @@ library(shinyjs)
 ### Data Read in ------------------
 
 global_singledevice_RL    <- read.csv("clean_data/datasets/indices_datasets/globalRL_singledevice_data.csv")
-#global_singledevice_RL    <- read.csv("clean_data/datasets/indices_datasets/global2325RL_data.csv")
 
 ### Store datasets in a named list ------------------
 datasets <- list(
@@ -757,20 +756,16 @@ server <- function(input, output, session) {
             # When plot_ly receives color as a plain vector with a named colors palette,
             # it assigns curveNumber by sorting the unique group names alphabetically.
             # So we sort the unique values present in avg_scores to match plotly's trace order.
-            avg_for_levels <- scores %>%
-              mutate(
-                Time_fmt_tmp = sprintf("%06d", as.numeric(Time)),
-                Time_posix   = as.POSIXct(Time_fmt_tmp, format = "%H%M%S", tz = "UTC"),
-                Minutes      = hour(Time_posix) * 60 + minute(Time_posix),
-                Time_bin     = floor(Minutes / 30) * 30
-              ) %>%
-              group_by(Time_bin, !!sym(colvar)) %>%
-              summarise(.groups = "drop")
+            avg_scores_for_order <- scores %>%
+              group_by(Time_label, Time_bin, !!sym(colvar)) %>%
+              summarise(.groups = "drop") %>%
+              arrange(Time_bin)
             
+
             # Sort alphabetically — this matches plotly's internal trace ordering
             # when color is passed as a plain vector with a named palette.
             # Exception: Season is always assigned before scoring so values are present.
-            rendered_groups <- sort(unique(as.character(avg_for_levels[[colvar]])))
+            rendered_groups <- unique(as.character(avg_scores_for_order[[colvar]]))
             
             clicked_group <- if (!is.null(curve_number) && curve_number + 1 <= length(rendered_groups)) {
               rendered_groups[curve_number + 1]
